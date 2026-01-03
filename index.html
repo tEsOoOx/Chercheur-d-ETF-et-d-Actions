@@ -3,97 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STOCKLY - Dashboard</title>
+    <title>STOCKLY PRO - Analyse Expert</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: white; margin: 0; }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; transition: all 0.3s ease; }
-        .glass-card:hover { transform: translateY(-4px); border-color: #6366f1; }
-        .active-tab { background: #6366f1; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f1a; color: white; }
+        .glass { background: rgba(22, 30, 46, 0.8); border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(12px); }
+        .card-active { border-color: #6366f1; background: rgba(99, 102, 241, 0.05); }
+        .gradient-text { background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useMemo } = React;
 
-        const DATA = [
-            { id: 1, name: 'Apple', ticker: 'AAPL', price: 228.4, currency: '$', type: 'action' },
-            { id: 2, name: 'LVMH', ticker: 'MC.PA', price: 625.5, currency: '€', type: 'action' },
-            { id: 3, name: 'Nvidia', ticker: 'NVDA', price: 118.2, currency: '$', type: 'action' },
-            { id: 4, name: 'S&P 500', ticker: 'CSPX', price: 545.2, currency: '$', type: 'etf' }
+        // --- BASE DE DONNÉES COMPLÈTE ---
+        const STOCKS_DATA = [
+            { id: 1, name: 'Apple', ticker: 'AAPL', sector: 'Tech', price: 228.40, currency: '$', pe: 28, profits: [94, 99, 100], status: 'Sain', region: 'USA' },
+            { id: 10, name: 'Microsoft', ticker: 'MSFT', sector: 'Tech', price: 415.60, currency: '$', pe: 36, profits: [61, 72, 88], status: 'Sain', region: 'USA' },
+            { id: 11, name: 'Nvidia', ticker: 'NVDA', sector: 'Tech', price: 118.20, currency: '$', pe: 72, profits: [4, 9, 29], status: 'Sain', region: 'USA' },
+            { id: 13, name: 'Alphabet', ticker: 'GOOGL', sector: 'Tech', price: 165.10, currency: '$', pe: 25, profits: [40, 60, 73], status: 'Sain', region: 'USA' },
+            { id: 33, name: 'Amazon', ticker: 'AMZN', sector: 'Tech', price: 188.30, currency: '$', pe: 61, profits: [33, -2, 30], status: 'Stable', region: 'USA' },
+            { id: 4, name: 'Coca-Cola', ticker: 'KO', sector: 'Conso', price: 68.10, currency: '$', pe: 23, profits: [9.5, 9.8, 10.5], status: 'Sain', region: 'USA' },
+            { id: 2, name: 'LVMH', ticker: 'MC.PA', sector: 'Luxe', price: 625.50, currency: '€', pe: 24, profits: [12, 14, 15.2], status: 'Sain', region: 'France' },
+            { id: 12, name: 'Hermès', ticker: 'RMS.PA', sector: 'Luxe', price: 2015.00, currency: '€', pe: 52, profits: [2.4, 3.3, 4.3], status: 'Sain', region: 'France' },
+            { id: 17, name: "L'Oréal", ticker: 'OR.PA', sector: 'Conso', price: 368.20, currency: '€', pe: 34, profits: [4.6, 5.7, 6.1], status: 'Sain', region: 'France' },
+            { id: 8, name: 'TotalEnergies', ticker: 'TTE.PA', sector: 'Energie', price: 61.40, currency: '€', pe: 8, profits: [16, 20, 19], status: 'Sain', region: 'France' },
+            { id: 21, name: 'Novo Nordisk', ticker: 'NOVO-B', sector: 'Santé', price: 845.00, currency: 'DKK', pe: 44, profits: [47, 55, 83], status: 'Sain', region: 'Europe' },
+            { id: 20, name: 'Ferrari', ticker: 'RACE', sector: 'Luxe', price: 422.10, currency: '€', pe: 51, profits: [0.8, 0.9, 1.2], status: 'Sain', region: 'Europe' }
+        ];
+
+        const ETFS_DATA = [
+            { id: 101, name: 'iShares Core S&P 500', ticker: 'CSPX', emitter: 'BlackRock', price: 545.20, currency: '$', ter: 0.07, region: 'USA' },
+            { id: 102, name: 'Amundi MSCI World (PEA)', ticker: 'CW8', emitter: 'Amundi', price: 512.45, currency: '€', ter: 0.38, region: 'Monde' },
+            { id: 103, name: 'Vanguard FTSE All-World', ticker: 'VWCE', emitter: 'Vanguard', price: 121.30, currency: '€', ter: 0.22, region: 'Monde' },
+            { id: 104, name: 'Lyxor Nasdaq 100', ticker: 'UST', emitter: 'Amundi', price: 65.40, currency: '€', ter: 0.30, region: 'USA' }
         ];
 
         function App() {
-            const [filter, setFilter] = useState('action');
+            const [activeTab, setActiveTab] = useState('stocks');
             const [search, setSearch] = useState('');
-            const [selected, setSelected] = useState([]);
+            const [regionFilter, setRegionFilter] = useState('Tous');
+            const [comparisonList, setComparisonList] = useState([]);
 
-            const filteredData = DATA.filter(item => 
-                item.type === filter && 
-                (item.name.toLowerCase().includes(search.toLowerCase()) || item.ticker.toLowerCase().includes(search.toLowerCase()))
-            );
+            const currentData = activeTab === 'stocks' ? STOCKS_DATA : ETFS_DATA;
 
-            const toggleSelect = (id) => {
-                if (selected.includes(id)) {
-                    setSelected(selected.filter(i => i !== id));
-                } else if (selected.length < 2) {
-                    setSelected([...selected, id]);
+            const filtered = useMemo(() => {
+                return currentData.filter(item => {
+                    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || item.ticker.toLowerCase().includes(search.toLowerCase());
+                    const matchesRegion = regionFilter === 'Tous' || item.region === regionFilter;
+                    return matchesSearch && matchesRegion;
+                });
+            }, [activeTab, search, regionFilter]);
+
+            const toggleCompare = (item) => {
+                if (comparisonList.find(i => i.id === item.id)) {
+                    setComparisonList(comparisonList.filter(i => i.id !== item.id));
+                } else if (comparisonList.length < 2) {
+                    setComparisonList([...comparisonList, item]);
                 }
             };
 
             return (
-                <div className="min-h-screen p-6 md:p-12">
-                    {/* HEADER */}
-                    <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-                        <h1 className="text-3xl font-extrabold tracking-tighter">STOCKLY<span className="text-indigo-500">PRO</span></h1>
-                        
-                        <div className="flex bg-slate-800 p-1.5 rounded-2xl border border-slate-700">
-                            <button onClick={() => setFilter('action')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${filter === 'action' ? 'active-tab' : 'text-slate-400'}`}>Actions</button>
-                            <button onClick={() => setFilter('etf')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${filter === 'etf' ? 'active-tab' : 'text-slate-400'}`}>ETF</button>
+                <div className="max-w-7xl mx-auto px-6 py-10">
+                    {/* Header */}
+                    <header className="flex flex-col lg:flex-row justify-between items-center gap-8 mb-16">
+                        <div>
+                            <h1 className="text-4xl font-black tracking-tighter mb-2">STOCKLY <span className="gradient-text italic">ANALYTICS</span></h1>
+                            <p className="text-slate-500 font-medium uppercase text-xs tracking-widest">Plateforme de comparaison interactive</p>
                         </div>
 
-                        <input 
-                            type="text" 
-                            placeholder="Rechercher..." 
-                            className="bg-slate-800 border border-slate-700 rounded-2xl px-6 py-3 outline-none focus:border-indigo-500 w-full md:w-64"
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
+                        <div className="flex bg-slate-900 p-1.5 rounded-2xl border border-white/5">
+                            <button onClick={() => {setActiveTab('stocks'); setComparisonList([]);}} className={`px-8 py-3 rounded-xl text-xs font-black uppercase transition-all ${activeTab === 'stocks' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400'}`}>Actions</button>
+                            <button onClick={() => {setActiveTab('etfs'); setComparisonList([]);}} className={`px-8 py-3 rounded-xl text-xs font-black uppercase transition-all ${activeTab === 'etfs' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400'}`}>ETFs</button>
+                        </div>
 
-                    {/* GRILLE INTERACTIVE */}
-                    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredData.map(item => (
-                            <div key={item.id} className={`glass-card p-8 ${selected.includes(item.id) ? 'ring-2 ring-indigo-500' : ''}`}>
-                                <div className="flex justify-between items-start mb-6">
-                                    <span className="text-[10px] font-black bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-lg uppercase">{item.ticker}</span>
-                                    <button 
-                                        onClick={() => toggleSelect(item.id)}
-                                        className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold transition-all ${selected.includes(item.id) ? 'bg-indigo-600' : 'bg-slate-700 hover:bg-slate-600'}`}
-                                    >
-                                        {selected.includes(item.id) ? '✓' : '+'}
-                                    </button>
-                                </div>
-                                <h3 className="text-2xl font-bold mb-2">{item.name}</h3>
-                                <div className="text-3xl font-black text-white mt-4">
-                                    {item.price} <span className="text-indigo-400 text-lg">{item.currency}</span>
-                                </div>
+                        <div className="flex gap-4 w-full lg:w-auto">
+                            <select 
+                                onChange={(e) => setRegionFilter(e.target.value)}
+                                className="bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-500"
+                            >
+                                <option value="Tous">Toutes Régions</option>
+                                <option value="USA">USA</option>
+                                <option value="France">France</option>
+                                <option value="Europe">Europe</option>
+                                <option value="Monde">Monde</option>
+                            </select>
+                            <input 
+                                type="text" 
+                                placeholder="Rechercher ticker..." 
+                                className="bg-slate-900 border border-white/10 rounded-2xl px-6 py-3 outline-none focus:border-indigo-500 flex-grow"
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
+                    </header>
+
+                    {/* Zone Duel */}
+                    {comparisonList.length > 0 && (
+                        <div className="mb-12 p-8 glass rounded-[2.5rem] border-2 border-indigo-500/30 animate-in">
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-xl font-black uppercase italic tracking-tighter">Comparaison Active</h2>
+                                <button onClick={() => setComparisonList([])} className="text-xs font-bold text-indigo-400 hover:text-white">EFFACER</button>
                             </div>
-                        ))}
-                    </div>
-
-                    {/* BARRE DE COMPARAISON FLOTTANTE */}
-                    {selected.length > 0 && (
-                        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-indigo-600 px-8 py-4 rounded-full shadow-2xl flex items-center gap-6 animate-bounce">
-                            <p className="font-bold text-sm">{selected.length} actif(s) sélectionné(s)</p>
-                            <button onClick={() => setSelected([])} className="bg-white/20 hover:bg-white/40 px-4 py-1 rounded-lg text-xs font-bold">Réinitialiser</button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {comparisonList.map(item => (
+                                    <div key={item.id} className="bg-white/5 p-6 rounded-3xl relative">
+                                        <div className="text-[10px] font-black text-indigo-400 mb-1 uppercase tracking-widest">{item.ticker}</div>
+                                        <h3 className="text-xl font-bold mb-4">{item.name}</h3>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="bg-black/20 p-3 rounded-xl text-center">
+                                                <div className="text-[9px] text-slate-500 uppercase font-black">Prix</div>
+                                                <div className="text-lg font-bold">{item.price}{item.currency}</div>
+                                            </div>
+                                            <div className="bg-black/20 p-3 rounded-xl text-center">
+                                                <div className="text-[9px] text-slate-500 uppercase font-black">{activeTab === 'stocks' ? 'P/E Ratio' : 'Frais (TER)'}</div>
+                                                <div className="text-lg font-bold">{activeTab === 'stocks' ? item.pe+'x' : item.ter+'%'}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
+
+                    {/* Grille Principale */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {filtered.map(item => {
+                            const isSelected = comparisonList.find(i => i.id === item.id);
+                            return (
+                                <div key={item.id} className={`glass p-6 rounded-[2rem] transition-all hover:scale-[1.02] ${isSelected ? 'card-active' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6">
+                                        <span className="text-[10px] font-black bg-white/5 px-3 py-1 rounded-lg text-slate-400 uppercase tracking-tighter">{item.ticker}</span>
+                                        <button 
+                                            onClick={() => toggleCompare(item)}
+                                            className={`p-2 rounded-xl transition-all ${isSelected ? 'bg-indigo-600 text-white' : 'bg-white/5 text-slate-500 hover:text-white'}`}
+                                        >
+                                            {isSelected ? '✓' : '+'}
+                                        </button>
+                                    </div>
+                                    <h4 className="text-lg font-bold mb-1">{item.name}</h4>
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase mb-6">{activeTab === 'stocks' ? item.sector : item.emitter} • {item.region}</p>
+                                    <div className="flex justify-between items-end border-t border-white/5 pt-4">
+                                        <div>
+                                            <p className="text-[9px] text-slate-500 uppercase font-black">Dernier Prix</p>
+                                            <p className="text-2xl font-black">{item.price}<span className="text-indigo-500 text-sm ml-1">{item.currency}</span></p>
+                                        </div>
+                                        {activeTab === 'stocks' && (
+                                            <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${item.status === 'Sain' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                                                {item.status}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             );
         }
