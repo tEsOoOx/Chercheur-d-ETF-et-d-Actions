@@ -21,96 +21,48 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // On récupère les icônes dont on a besoin depuis l'objet lucide mondial
+        // Chargement des icônes
         const { 
             TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, Search, 
             Globe, ArrowRightLeft, ShieldCheck, Zap, Activity, X, Plus, 
             Info, MapPin, Building2, DollarSign 
         } = lucide;
 
+        // --- DONNÉES ---
         const STOCKS_DATA = [
             { id: 1, name: 'Apple', ticker: 'AAPL', sector: 'Tech', price: 228.40, currency: '$', pe: 28, profits: [94, 99, 100], debt: 'Baisse', dividend: 'Couvert', status: 'Sain', region: 'USA' },
             { id: 10, name: 'Microsoft', ticker: 'MSFT', sector: 'Tech', price: 415.60, currency: '$', pe: 36, profits: [61, 72, 88], debt: 'Nulle', dividend: 'Croissant', status: 'Sain', region: 'USA' },
             { id: 11, name: 'Nvidia', ticker: 'NVDA', sector: 'Tech', price: 118.20, currency: '$', pe: 72, profits: [4, 9, 29], debt: 'Nulle', dividend: 'Symbolique', status: 'Sain', region: 'USA' },
-            { id: 13, name: 'Alphabet', ticker: 'GOOGL', sector: 'Tech', price: 165.10, currency: '$', pe: 25, profits: [40, 60, 73], debt: 'Nulle', dividend: 'Nul', status: 'Sain', region: 'USA' },
-            { id: 33, name: 'Amazon', ticker: 'AMZN', sector: 'Tech', price: 188.30, currency: '$', pe: 61, profits: [33, -2, 30], debt: 'Stable', dividend: 'Nul', status: 'Sain', region: 'USA' },
-            { id: 4, name: 'Coca-Cola', ticker: 'KO', sector: 'Conso', price: 68.10, currency: '$', pe: 23, profits: [9.5, 9.8, 10.5], debt: 'Stable', dividend: 'Aristocrate', status: 'Sain', region: 'USA' },
-            { id: 9, name: 'Disney', ticker: 'DIS', sector: 'Loisirs', price: 92.45, currency: '$', pe: 65, profits: [3, 2.5, 2.1], debt: 'Hausse', dividend: 'Irrégulier', status: 'Critique', region: 'USA' },
             { id: 2, name: 'LVMH', ticker: 'MC.PA', sector: 'Luxe', price: 625.50, currency: '€', pe: 24, profits: [12, 14, 15.2], debt: 'Maîtrisée', dividend: 'Régulier', status: 'Sain', region: 'France' },
-            { id: 12, name: 'Hermès', ticker: 'RMS.PA', sector: 'Luxe', price: 2015.00, currency: '€', pe: 52, profits: [2.4, 3.3, 4.3], debt: 'Nulle', dividend: 'Régulier', status: 'Sain', region: 'France' },
-            { id: 17, name: 'L\'Oréal', ticker: 'OR.PA', sector: 'Conso', price: 368.20, currency: '€', pe: 34, profits: [4.6, 5.7, 6.1], debt: 'Nulle', dividend: 'Stable', status: 'Sain', region: 'France' },
-            { id: 8, name: 'TotalEnergies', ticker: 'TTE.PA', sector: 'Energie', price: 61.40, currency: '€', pe: 8, profits: [16, 20, 19], debt: 'Baisse', dividend: 'Élevé', status: 'Sain', region: 'France' },
-            { id: 7, name: 'Air Liquide', ticker: 'AI.PA', sector: 'Industrie', price: 168.15, currency: '€', pe: 26, profits: [2.5, 2.7, 3.1], debt: 'Maîtrisée', dividend: 'Régulier', status: 'Sain', region: 'France' },
-            { id: 22, name: 'Sanofi', ticker: 'SAN.PA', sector: 'Santé', price: 91.80, currency: '€', pe: 12, profits: [6.2, 8.3, 5.4], debt: 'Stable', dividend: 'Élevé', status: 'Sain', region: 'France' },
-            { id: 21, name: 'Novo Nordisk', ticker: 'NOVO-B', sector: 'Santé', price: 845.00, currency: 'DKK', pe: 44, profits: [47, 55, 83], debt: 'Nulle', dividend: 'Stable', status: 'Sain', region: 'Europe' },
-            { id: 15, name: 'ASML', ticker: 'ASML', sector: 'Semi', price: 712.40, currency: '€', pe: 45, profits: [5.8, 5.6, 7.8], debt: 'Maîtrisée', dividend: 'Régulier', status: 'Sain', region: 'Europe' },
-            { id: 20, name: 'Ferrari', ticker: 'RACE', sector: 'Luxe', price: 422.10, currency: '€', pe: 51, profits: [0.8, 0.9, 1.2], debt: 'Baisse', dividend: 'Croissant', status: 'Sain', region: 'Europe' }
+            { id: 12, name: 'Hermès', ticker: 'RMS.PA', sector: 'Luxe', price: 2015.00, currency: '€', pe: 52, profits: [2.4, 3.3, 4.3], debt: 'Nulle', dividend: 'Régulier', status: 'Sain', region: 'France' }
         ];
 
         const ETFS_DATA = [
             { id: 101, name: 'iShares Core S&P 500', ticker: 'CSPX', emitter: 'BlackRock', price: 545.20, currency: '$', ter: 0.07, td: -0.05, domicile: 'IE', region: 'USA', liquidity: 'Excellente' },
-            { id: 102, name: 'Amundi MSCI World (PEA)', ticker: 'CW8', emitter: 'Amundi', price: 512.45, currency: '€', ter: 0.38, td: 0.02, domicile: 'LU', region: 'Monde', liquidity: 'Haute' },
-            { id: 103, name: 'Vanguard FTSE All-World', ticker: 'VWCE', emitter: 'Vanguard', price: 121.30, currency: '€', ter: 0.22, td: -0.01, domicile: 'IE', region: 'Monde', liquidity: 'Excellente' },
-            { id: 121, name: 'BNP Easy S&P 500 (PEA)', ticker: 'ESE', emitter: 'BNP Paribas', price: 32.15, currency: '€', ter: 0.15, td: 0.01, domicile: 'FR', region: 'USA', liquidity: 'Moyenne' },
-            { id: 122, name: 'Lyxor CAC 40 (Acc)', ticker: 'CAC', emitter: 'Amundi', price: 74.80, currency: '€', ter: 0.25, td: 0.04, domicile: 'FR', region: 'France', liquidity: 'Haute' },
-            { id: 139, name: 'Amundi Smart Cash', ticker: 'CSH2', emitter: 'Amundi', price: 118.45, currency: '€', ter: 0.05, td: 0.01, domicile: 'LU', region: 'Europe', liquidity: 'Maximale' }
+            { id: 102, name: 'Amundi MSCI World (PEA)', ticker: 'CW8', emitter: 'Amundi', price: 512.45, currency: '€', ter: 0.38, td: 0.02, domicile: 'LU', region: 'Monde', liquidity: 'Haute' }
         ];
 
+        // --- COMPOSANTS INTERFACE ---
         const ComparisonRow = ({ label, value, sub, highlight }) => (
-            <div className="flex items-center justify-between p-6 bg-slate-50/70 rounded-[2rem] border border-slate-100 transition-all hover:bg-white hover:shadow-lg">
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-2">
                 <div>
-                    <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{label}</div>
-                    <div className={`text-lg font-black ${highlight ? 'text-indigo-600' : 'text-slate-900'}`}>{value}</div>
-                    {sub && <div className="text-[10px] text-slate-400 font-bold mt-1 italic leading-tight">{sub}</div>}
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</div>
+                    <div className={`text-md font-black ${highlight ? 'text-indigo-600' : 'text-slate-900'}`}>{value}</div>
+                    {sub && <div className="text-[10px] text-slate-400 italic">{sub}</div>}
                 </div>
-                {highlight && <div className="bg-indigo-100 p-2 rounded-xl"><CheckCircle2 size={20} className="text-indigo-600"/></div>}
-            </div>
-        );
-
-        const InfoCard = ({ icon, title, text }) => (
-            <div className="bg-white p-10 rounded-[3rem] border border-slate-200 flex flex-col gap-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div className="w-14 h-14 rounded-[1.5rem] bg-slate-50 flex items-center justify-center border border-slate-100 shadow-inner">{icon}</div>
-                <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-800">{title}</h4>
-                <p className="text-[11px] text-slate-500 font-bold leading-relaxed">{text}</p>
+                {highlight && <CheckCircle2 size={18} className="text-indigo-600"/>}
             </div>
         );
 
         const App = () => {
-            const [activeTab, setActiveTab] = React.useState('etfs');
+            const [activeTab, setActiveTab] = React.useState('stocks');
             const [search, setSearch] = React.useState('');
-            const [domicileFilter, setDomicileFilter] = React.useState('all');
-            const [regionFilter, setRegionFilter] = React.useState('all');
             const [comparisonList, setComparisonList] = React.useState([]);
 
-            const analyzeProfits = (profits) => {
-                const last = profits[profits.length - 1];
-                const first = profits[0];
-                const trend = profits[profits.length - 1] - profits[profits.length - 2];
-                if (last > first && trend > 0) return { label: 'Croissance', color: 'text-emerald-600', icon: <TrendingUp size={14}/> };
-                if (last < first) return { label: 'Alerte', color: 'text-rose-600', icon: <TrendingDown size={14}/> };
-                return { label: 'Stable', color: 'text-amber-600', icon: <ArrowRightLeft size={14}/> };
-            };
-
-            const analyzeETFStatus = (etf) => {
-                if (etf.ter <= 0.15 && etf.td <= 0.05) return { status: 'Top Tier', color: 'text-emerald-600', bg: 'bg-emerald-100/50' };
-                if (etf.ter > 0.40 || etf.td > 0.15) return { status: 'Cher', color: 'text-rose-600', bg: 'bg-rose-100/50' };
-                return { status: 'Correct', color: 'text-blue-600', bg: 'bg-blue-100/50' };
-            };
-
-            const filteredStocks = React.useMemo(() => 
-                STOCKS_DATA.filter(s => {
-                    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.ticker.toLowerCase().includes(search.toLowerCase());
-                    const matchRegion = regionFilter === 'all' || s.region === regionFilter;
-                    return matchSearch && matchRegion;
-                }), [search, regionFilter]);
-
-            const filteredETFs = React.useMemo(() => 
-                ETFS_DATA.filter(e => {
-                    const matchSearch = e.name.toLowerCase().includes(search.toLowerCase()) || e.ticker.toLowerCase().includes(search.toLowerCase());
-                    const matchDomicile = domicileFilter === 'all' || e.domicile === domicileFilter;
-                    const matchRegion = regionFilter === 'all' || e.region === regionFilter;
-                    return matchSearch && matchDomicile && matchRegion;
-                }), [search, domicileFilter, regionFilter]);
+            const filteredData = (activeTab === 'stocks' ? STOCKS_DATA : ETFS_DATA).filter(item => 
+                item.name.toLowerCase().includes(search.toLowerCase()) || 
+                item.ticker.toLowerCase().includes(search.toLowerCase())
+            );
 
             const toggleComparison = (item) => {
                 if (comparisonList.find(i => i.id === item.id)) {
@@ -121,158 +73,67 @@
             };
 
             return (
-                <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 font-sans">
-                    <nav className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-                        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-3 shrink-0">
-                                <div className="bg-indigo-600 p-2.5 rounded-2xl text-white shadow-lg shadow-indigo-100">
-                                    <Activity size={22} strokeWidth={3} />
-                                </div>
-                                <div className="font-black text-2xl tracking-tighter hidden sm:block">
-                                    STOCK<span className="text-indigo-600">LY</span>
-                                </div>
+                <div className="min-h-screen bg-slate-50 pb-10">
+                    <nav className="bg-white border-b p-4 sticky top-0 z-10 shadow-sm">
+                        <div className="max-w-5xl mx-auto flex items-center justify-between">
+                            <div className="flex items-center gap-2 font-black text-xl tracking-tighter">
+                                <Activity className="text-indigo-600" /> STOCKLY
                             </div>
-                            
-                            <div className="flex-1 max-w-xl relative">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <input 
-                                    type="text" 
-                                    placeholder="Rechercher World, LVMH, Nasdaq, PEA..." 
-                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-100 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                {comparisonList.length > 0 && (
-                                    <div className="bg-indigo-50 px-4 py-2 rounded-2xl flex items-center gap-3 border border-indigo-100">
-                                        <span className="text-[10px] font-black text-indigo-700 uppercase tracking-widest">{comparisonList.length}/2 Duel</span>
-                                        <button onClick={() => setComparisonList([])} className="text-indigo-400 hover:text-indigo-600"><X size={14}/></button>
-                                    </div>
-                                )}
-                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Rechercher..." 
+                                className="bg-slate-100 border-none rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
                         </div>
                     </nav>
 
-                    <main className="max-w-7xl mx-auto px-4 py-8">
-                        <div className="flex flex-col lg:flex-row gap-6 mb-8 justify-between items-start">
-                            <div className="flex gap-1 p-1.5 bg-slate-200/70 rounded-2xl w-fit">
-                                <button onClick={() => {setActiveTab('stocks'); setComparisonList([]);}} className={`px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-[0.15em] transition-all ${activeTab === 'stocks' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Actions</button>
-                                <button onClick={() => {setActiveTab('etfs'); setComparisonList([]);}} className={`px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-[0.15em] transition-all ${activeTab === 'etfs' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>ETF (Fonds)</button>
-                            </div>
-
-                            <div className="flex flex-wrap gap-3">
-                                <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl border border-slate-200 shadow-sm">
-                                    <MapPin size={16} className="text-indigo-500"/>
-                                    <select className="text-[11px] font-black bg-transparent outline-none cursor-pointer uppercase" value={regionFilter} onChange={(e) => setRegionFilter(e.target.value)}>
-                                        <option value="all">Toutes Zones</option>
-                                        <option value="France">France 🇫🇷</option>
-                                        <option value="USA">USA 🇺🇸</option>
-                                        <option value="Europe">Europe 🇪🇺</option>
-                                        <option value="Monde">Monde 🌏</option>
-                                    </select>
-                                </div>
-                            </div>
+                    <main className="max-w-5xl mx-auto p-4">
+                        <div className="flex gap-2 mb-6">
+                            <button onClick={() => setActiveTab('stocks')} className={`px-6 py-2 rounded-xl font-bold text-sm ${activeTab === 'stocks' ? 'bg-indigo-600 text-white' : 'bg-white border text-slate-500'}`}>Actions</button>
+                            <button onClick={() => setActiveTab('etfs')} className={`px-6 py-2 rounded-xl font-bold text-sm ${activeTab === 'etfs' ? 'bg-indigo-600 text-white' : 'bg-white border text-slate-500'}`}>ETF</button>
                         </div>
 
-                        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse min-w-[900px]">
-                                    <thead className="bg-slate-50/80 border-b border-slate-100">
-                                        <tr>
-                                            <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Actif</th>
-                                            <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Zone</th>
-                                            <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Prix</th>
-                                            <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">{activeTab === 'stocks' ? 'Tendance' : 'Frais'}</th>
-                                            <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Qualité</th>
-                                            <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Duel</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {(activeTab === 'stocks' ? filteredStocks : filteredETFs).map(item => {
-                                            const isSelected = comparisonList.find(i => i.id === item.id);
-                                            const etfStatus = activeTab === 'etfs' ? analyzeETFStatus(item) : null;
-                                            const stockTrend = activeTab === 'stocks' ? analyzeProfits(item.profits) : null;
-
-                                            return (
-                                                <tr key={item.id} className={`border-b border-slate-50 transition-all ${isSelected ? 'bg-indigo-50/70' : 'hover:bg-slate-50/50'}`}>
-                                                    <td className="p-6">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center font-black text-[10px] border shadow-inner shrink-0">{item.ticker.substring(0,3)}</div>
-                                                            <div>
-                                                                <div className="font-black text-slate-900 text-sm">{item.name}</div>
-                                                                <div className="text-[10px] text-slate-500 font-bold uppercase">{item.ticker}</div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="p-6 text-center">
-                                                        <span className="text-[10px] font-black bg-white border border-slate-200 px-3 py-1.5 rounded-xl text-slate-700">{item.region}</span>
-                                                    </td>
-                                                    <td className="p-6 text-center font-mono font-black text-sm">{item.price} {item.currency}</td>
-                                                    <td className="p-6 text-center">
-                                                        {activeTab === 'stocks' ? (
-                                                            <div className={`flex items-center justify-center gap-2 font-black text-xs ${stockTrend.color}`}>{stockTrend.label}</div>
-                                                        ) : (
-                                                            <div className="font-mono font-black text-slate-800 text-xs">{item.ter}%</div>
-                                                        )}
-                                                    </td>
-                                                    <td className="p-6 text-center">
-                                                        {activeTab === 'stocks' ? (
-                                                            item.status === 'Sain' ? <span className="text-emerald-500">✔</span> : <span className="text-rose-500">✘</span>
-                                                        ) : (
-                                                            <div className={`${etfStatus.bg} ${etfStatus.color} px-4 py-1.5 rounded-xl text-[10px] font-black uppercase`}>{etfStatus.status}</div>
-                                                        )}
-                                                    </td>
-                                                    <td className="p-6 text-right">
-                                                        <button onClick={() => toggleComparison(item)} className={`p-3 rounded-2xl transition-all shadow-sm ${isSelected ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-400 hover:text-indigo-600'}`}>
-                                                            {isSelected ? <X size={20}/> : <Plus size={20}/>}
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div className="bg-white rounded-3xl border shadow-sm overflow-hidden">
+                            {filteredData.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-5 border-b last:border-none hover:bg-slate-50 transition-colors">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-black text-[10px]">{item.ticker.substring(0,3)}</div>
+                                        <div>
+                                            <div className="font-bold text-slate-900">{item.name}</div>
+                                            <div className="text-xs text-slate-500">{item.ticker} • {item.region}</div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-6">
+                                        <div className="text-right">
+                                            <div className="font-black text-sm">{item.price} {item.currency}</div>
+                                            <div className="text-[10px] text-slate-400">{activeTab === 'stocks' ? item.sector : 'Frais: ' + item.ter + '%'}</div>
+                                        </div>
+                                        <button onClick={() => toggleComparison(item)} className={`p-2 rounded-lg border ${comparisonList.find(i => i.id === item.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'text-slate-300 hover:border-indigo-500 hover:text-indigo-500'}`}>
+                                            <Plus size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         {comparisonList.length === 2 && (
-                            <div className="mt-16">
-                                <h2 className="text-4xl font-black italic mb-12 uppercase text-slate-800">DUEL <span className="text-indigo-600">VS</span></h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                    {comparisonList.map((asset, idx) => (
-                                        <div key={asset.id} className="bg-white rounded-[3.5rem] p-12 border border-slate-100 shadow-2xl">
-                                            <div className="flex justify-between items-start mb-12">
-                                                <div>
-                                                    <span className="text-[10px] font-black text-indigo-600 uppercase mb-2 block">{asset.ticker}</span>
-                                                    <h3 className="text-4xl font-black text-slate-900 leading-[0.9]">{asset.name}</h3>
-                                                </div>
-                                                <div className="bg-slate-900 text-white px-6 py-4 rounded-[2rem] text-center">
-                                                    <div className="text-[9px] font-black text-slate-400 uppercase mb-1">Prix</div>
-                                                    <div className="text-xl font-mono font-black italic">{asset.price} {asset.currency}</div>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-6">
-                                                {activeTab === 'stocks' ? (
-                                                    <ComparisonRow label="Valorisation (PER)" value={`${asset.pe}x`} highlight={asset.pe < 25} />
-                                                ) : (
-                                                    <ComparisonRow label="Frais Annuels (TER)" value={`${asset.ter}%`} highlight={asset.ter < 0.15} />
-                                                )}
-                                                <ComparisonRow label="Zone Géographique" value={asset.region} />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="mt-10 grid md:grid-cols-2 gap-6 animate-bounce-in">
+                                {comparisonList.map(asset => (
+                                    <div key={asset.id} className="bg-white p-8 rounded-[2.5rem] border-2 border-indigo-500 shadow-xl">
+                                        <div className="text-xs font-bold text-indigo-500 mb-1">{asset.ticker}</div>
+                                        <div className="text-2xl font-black mb-6">{asset.name}</div>
+                                        <ComparisonRow label="Prix Actuel" value={`${asset.price} ${asset.currency}`} />
+                                        {activeTab === 'stocks' ? (
+                                            <ComparisonRow label="Dette" value={asset.debt} highlight={asset.debt === 'Nulle'} />
+                                        ) : (
+                                            <ComparisonRow label="Frais (TER)" value={`${asset.ter}%`} highlight={asset.ter < 0.10} />
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </main>
-
-                    <footer className="max-w-7xl mx-auto px-4 mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 pb-20">
-                        <InfoCard icon={<DollarSign className="text-indigo-500"/>} title="Prix" text="Le prix affiché est un indicateur de barrière à l'entrée." />
-                        <InfoCard icon={<ShieldCheck className="text-emerald-500"/>} title="Sécurité" text="Analyse du domicile fiscal des fonds pour maximiser vos rendements." />
-                        <InfoCard icon={<Zap className="text-orange-500"/>} title="Performance" text="Comparez les frais avant de prendre une décision." />
-                    </footer>
                 </div>
             );
         };
