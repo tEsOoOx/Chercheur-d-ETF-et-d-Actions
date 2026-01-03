@@ -3,169 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STOCKLY - Interface Interactive</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <title>STOCKLY PRO</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .duel-gradient { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
-        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
-        /* Animation fluide */
-        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; }
+        .card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; transition: all 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .btn-active { background: white; color: #4f46e5; shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; color: #6366f1;">
+            <h2>Chargement de Stockly...</h2>
+        </div>
+    </div>
 
     <script type="text/babel">
-        // Accès aux icônes Lucide
-        const { 
-            TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, Search, 
-            Globe, ArrowRightLeft, ShieldCheck, Zap, Activity, X, Plus, 
-            Info, MapPin, Building2, DollarSign 
-        } = lucide;
+        const { useState, useMemo } = React;
 
-        // --- DONNÉES ---
-        const STOCKS_DATA = [
-            { id: 1, name: 'Apple', ticker: 'AAPL', sector: 'Tech', price: 228.40, currency: '$', pe: 28, profits: [94, 99, 100], debt: 'Baisse', dividend: 'Couvert', status: 'Sain', region: 'USA' },
-            { id: 10, name: 'Microsoft', ticker: 'MSFT', sector: 'Tech', price: 415.60, currency: '$', pe: 36, profits: [61, 72, 88], debt: 'Nulle', dividend: 'Croissant', status: 'Sain', region: 'USA' },
-            { id: 11, name: 'Nvidia', ticker: 'NVDA', sector: 'Tech', price: 118.20, currency: '$', pe: 72, profits: [4, 9, 29], debt: 'Nulle', dividend: 'Symbolique', status: 'Sain', region: 'USA' },
-            { id: 2, name: 'LVMH', ticker: 'MC.PA', sector: 'Luxe', price: 625.50, currency: '€', pe: 24, profits: [12, 14, 15.2], debt: 'Maîtrisée', dividend: 'Régulier', status: 'Sain', region: 'France' },
-            { id: 12, name: 'Hermès', ticker: 'RMS.PA', sector: 'Luxe', price: 2015.00, currency: '€', pe: 52, profits: [2.4, 3.3, 4.3], debt: 'Nulle', dividend: 'Régulier', status: 'Sain', region: 'France' },
-            { id: 21, name: 'Novo Nordisk', ticker: 'NOVO-B', sector: 'Santé', price: 845.00, currency: 'DKK', pe: 44, profits: [47, 55, 83], debt: 'Nulle', dividend: 'Stable', status: 'Sain', region: 'Europe' }
+        const STOCKS = [
+            { id: 1, name: 'Apple', ticker: 'AAPL', price: 228.4, currency: '$', sector: 'Tech' },
+            { id: 2, name: 'LVMH', ticker: 'MC.PA', price: 625.5, currency: '€', sector: 'Luxe' },
+            { id: 3, name: 'Nvidia', ticker: 'NVDA', price: 118.2, currency: '$', sector: 'Tech' },
+            { id: 4, name: 'Microsoft', ticker: 'MSFT', price: 415.6, currency: '$', sector: 'Tech' }
         ];
-
-        const ETFS_DATA = [
-            { id: 101, name: 'iShares Core S&P 500', ticker: 'CSPX', emitter: 'BlackRock', price: 545.20, currency: '$', ter: 0.07, td: -0.05, domicile: 'IE', region: 'USA', liquidity: 'Excellente' },
-            { id: 102, name: 'Amundi MSCI World (PEA)', ticker: 'CW8', emitter: 'Amundi', price: 512.45, currency: '€', ter: 0.38, td: 0.02, domicile: 'LU', region: 'Monde', liquidity: 'Haute' }
-        ];
-
-        // --- COMPOSANTS ---
-        const ComparisonRow = ({ label, value, sub, highlight }) => (
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-2">
-                <div>
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</div>
-                    <div className={`text-md font-black ${highlight ? 'text-indigo-600' : 'text-slate-900'}`}>{value}</div>
-                    {sub && <div className="text-[10px] text-slate-400 font-medium">{sub}</div>}
-                </div>
-            </div>
-        );
 
         const App = () => {
-            const [activeTab, setActiveTab] = React.useState('stocks');
-            const [search, setSearch] = React.useState('');
-            const [comparisonList, setComparisonList] = React.useState([]);
+            const [tab, setTab] = useState('stocks');
+            const [search, setSearch] = useState('');
+            const [duel, setDuel] = useState([]);
 
-            // Logique de filtrage
-            const currentData = activeTab === 'stocks' ? STOCKS_DATA : ETFS_DATA;
-            const filtered = currentData.filter(item => 
-                item.name.toLowerCase().includes(search.toLowerCase()) || 
-                item.ticker.toLowerCase().includes(search.toLowerCase())
+            const filtered = STOCKS.filter(s => 
+                s.name.toLowerCase().includes(search.toLowerCase()) || 
+                s.ticker.toLowerCase().includes(search.toLowerCase())
             );
 
-            const toggleComparison = (item) => {
-                if (comparisonList.find(i => i.id === item.id)) {
-                    setComparisonList(comparisonList.filter(i => i.id !== item.id));
-                } else if (comparisonList.length < 2) {
-                    setComparisonList([...comparisonList, item]);
-                }
+            const handleDuel = (s) => {
+                if (duel.find(x => x.id === s.id)) setDuel(duel.filter(x => x.id !== s.id));
+                else if (duel.length < 2) setDuel([...duel, s]);
             };
 
-            // Re-déclencher Lucide à chaque rendu
-            React.useEffect(() => {
-                lucide.createIcons();
-            });
-
             return (
-                <div className="max-w-6xl mx-auto px-4 py-10">
-                    {/* Header identique à Gemini */}
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-                        <div className="flex items-center gap-4">
-                            <div className="bg-indigo-600 p-3 rounded-2xl text-white shadow-lg shadow-indigo-200">
-                                <Activity size={24} />
+                <div className="min-h-screen p-4 md:p-10">
+                    <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+                        <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">STOCK<span className="text-indigo-600">LY</span></h1>
+                        
+                        <div className="flex bg-slate-200 p-1 rounded-xl">
+                            <button onClick={() => setTab('stocks')} className={`px-6 py-2 rounded-lg font-bold text-xs uppercase tracking-widest ${tab === 'stocks' ? 'bg-white text-indigo-600 shadow' : 'text-slate-500'}`}>Actions</button>
+                            <button onClick={() => setTab('etfs')} className={`px-6 py-2 rounded-lg font-bold text-xs uppercase tracking-widest ${tab === 'etfs' ? 'bg-white text-indigo-600 shadow' : 'text-slate-500'}`}>ETF</button>
+                        </div>
+
+                        <input 
+                            type="text" 
+                            placeholder="Rechercher..." 
+                            className="w-full md:w-64 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500"
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </header>
+
+                    {duel.length > 0 && (
+                        <div className="max-w-6xl mx-auto mb-10 p-8 bg-indigo-600 rounded-[3rem] text-white">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-2xl font-black italic uppercase">Mode Duel</h2>
+                                <button onClick={() => setDuel([])} className="bg-white/20 p-2 rounded-full">✕</button>
                             </div>
-                            <h1 className="text-3xl font-black tracking-tighter uppercase text-slate-900">Stock<span className="text-indigo-600">ly</span></h1>
-                        </div>
-
-                        <div className="flex bg-slate-200/50 p-1.5 rounded-2xl w-fit border border-slate-200">
-                            <button onClick={() => {setActiveTab('stocks'); setComparisonList([]);}} className={`px-8 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${activeTab === 'stocks' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>Actions</button>
-                            <button onClick={() => {setActiveTab('etfs'); setComparisonList([]);}} className={`px-8 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${activeTab === 'etfs' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>ETF</button>
-                        </div>
-
-                        <div className="relative w-full md:w-80">
-                            <Search className="absolute left-4 top-3.5 text-slate-400" size={18} />
-                            <input 
-                                type="text" 
-                                placeholder="Rechercher un actif..." 
-                                className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none card-shadow"
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Grille des cartes */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 animate-in">
-                        {filtered.map(item => {
-                            const isSelected = comparisonList.find(i => i.id === item.id);
-                            return (
-                                <div key={item.id} className={`bg-white p-6 rounded-[2.5rem] border-2 transition-all card-shadow ${isSelected ? 'border-indigo-500' : 'border-transparent'}`}>
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="bg-slate-100 px-3 py-1 rounded-lg text-[10px] font-black text-slate-500 uppercase">{item.ticker}</div>
-                                        <button onClick={() => toggleComparison(item)} className={`p-2 rounded-xl transition-all ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400 hover:text-indigo-600'}`}>
-                                            {isSelected ? <X size={20}/> : <Plus size={20}/>}
-                                        </button>
-                                    </div>
-                                    <h3 className="text-xl font-black text-slate-900 mb-1">{item.name}</h3>
-                                    <p className="text-xs text-slate-400 font-bold uppercase mb-6">{activeTab === 'stocks' ? item.sector : item.emitter} • {item.region}</p>
-                                    <div className="flex justify-between items-end border-t border-slate-50 pt-5">
-                                        <div>
-                                            <p className="text-[10px] text-slate-400 font-black uppercase">Prix</p>
-                                            <p className="text-2xl font-black text-slate-900 tracking-tighter">{item.price} <span className="text-indigo-500 text-sm font-bold">{item.currency}</span></p>
-                                        </div>
-                                        <div className="bg-emerald-100 text-emerald-600 p-2 rounded-xl border border-emerald-200">
-                                            <CheckCircle2 size={18} />
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Mode DUEL - Apparaît si 2 sélectionnés */}
-                    {comparisonList.length === 2 && (
-                        <div className="mt-10 p-10 bg-white border-2 border-indigo-500 rounded-[3rem] card-shadow animate-in">
-                            <h2 className="text-3xl font-black italic text-slate-900 mb-10 flex items-center gap-4 uppercase tracking-tighter">
-                                <ArrowRightLeft className="text-indigo-600" /> Duel Indicatif
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                {comparisonList.map(item => (
-                                    <div key={item.id} className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100">
-                                        <p className="text-indigo-600 font-black text-xs uppercase mb-2">{item.ticker}</p>
-                                        <h4 className="text-2xl font-black mb-6">{item.name}</h4>
-                                        <div className="space-y-2">
-                                            <ComparisonRow label="Prix" value={`${item.price} ${item.currency}`} />
-                                            {activeTab === 'stocks' ? (
-                                                <>
-                                                    <ComparisonRow label="P/E Ratio" value={`${item.pe}x`} highlight={item.pe < 30} />
-                                                    <ComparisonRow label="Dette" value={item.debt} highlight={item.debt === 'Nulle'} />
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <ComparisonRow label="Frais (TER)" value={`${item.ter}%`} highlight={item.ter < 0.10} />
-                                                    <ComparisonRow label="Domicile" value={item.domicile} />
-                                                </>
-                                            )}
-                                        </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {duel.map(s => (
+                                    <div key={s.id} className="bg-white/10 p-6 rounded-2xl border border-white/20">
+                                        <div className="text-xs font-bold opacity-70 uppercase mb-1">{s.ticker}</div>
+                                        <div className="text-xl font-black">{s.name}</div>
+                                        <div className="text-2xl font-mono mt-4">{s.price} {s.currency}</div>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     )}
+
+                    <main className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filtered.map(s => (
+                            <div key={s.id} className="card p-6">
+                                <div className="flex justify-between mb-4">
+                                    <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded text-[10px] font-black uppercase">{s.ticker}</span>
+                                    <button onClick={() => handleDuel(s)} className={`p-2 rounded-lg ${duel.find(x => x.id === s.id) ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                        {duel.find(x => x.id === s.id) ? '✕' : '+'}
+                                    </button>
+                                </div>
+                                <h3 className="text-xl font-black text-slate-900">{s.name}</h3>
+                                <p className="text-xs text-slate-400 font-bold uppercase mb-6">{s.sector}</p>
+                                <div className="text-2xl font-black text-slate-900">{s.price} <span className="text-indigo-600 text-sm">{s.currency}</span></div>
+                            </div>
+                        ))}
+                    </main>
                 </div>
             );
         };
