@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STOCKLY PRO - Analyse Expert</title>
+    <title>STOCKLY ULTIMATE - 80+ Actifs</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -14,6 +14,9 @@
         .glass { background: rgba(22, 30, 46, 0.8); border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(12px); }
         .card-active { border-color: #6366f1; background: rgba(99, 102, 241, 0.05); }
         .gradient-text { background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0f1a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -22,27 +25,56 @@
     <script type="text/babel">
         const { useState, useMemo } = React;
 
-        // --- BASE DE DONNÉES COMPLÈTE ---
         const STOCKS_DATA = [
-            { id: 1, name: 'Apple', ticker: 'AAPL', sector: 'Tech', price: 228.40, currency: '$', pe: 28, profits: [94, 99, 100], status: 'Sain', region: 'USA' },
-            { id: 10, name: 'Microsoft', ticker: 'MSFT', sector: 'Tech', price: 415.60, currency: '$', pe: 36, profits: [61, 72, 88], status: 'Sain', region: 'USA' },
-            { id: 11, name: 'Nvidia', ticker: 'NVDA', sector: 'Tech', price: 118.20, currency: '$', pe: 72, profits: [4, 9, 29], status: 'Sain', region: 'USA' },
-            { id: 13, name: 'Alphabet', ticker: 'GOOGL', sector: 'Tech', price: 165.10, currency: '$', pe: 25, profits: [40, 60, 73], status: 'Sain', region: 'USA' },
-            { id: 33, name: 'Amazon', ticker: 'AMZN', sector: 'Tech', price: 188.30, currency: '$', pe: 61, profits: [33, -2, 30], status: 'Stable', region: 'USA' },
-            { id: 4, name: 'Coca-Cola', ticker: 'KO', sector: 'Conso', price: 68.10, currency: '$', pe: 23, profits: [9.5, 9.8, 10.5], status: 'Sain', region: 'USA' },
-            { id: 2, name: 'LVMH', ticker: 'MC.PA', sector: 'Luxe', price: 625.50, currency: '€', pe: 24, profits: [12, 14, 15.2], status: 'Sain', region: 'France' },
-            { id: 12, name: 'Hermès', ticker: 'RMS.PA', sector: 'Luxe', price: 2015.00, currency: '€', pe: 52, profits: [2.4, 3.3, 4.3], status: 'Sain', region: 'France' },
-            { id: 17, name: "L'Oréal", ticker: 'OR.PA', sector: 'Conso', price: 368.20, currency: '€', pe: 34, profits: [4.6, 5.7, 6.1], status: 'Sain', region: 'France' },
-            { id: 8, name: 'TotalEnergies', ticker: 'TTE.PA', sector: 'Energie', price: 61.40, currency: '€', pe: 8, profits: [16, 20, 19], status: 'Sain', region: 'France' },
-            { id: 21, name: 'Novo Nordisk', ticker: 'NOVO-B', sector: 'Santé', price: 845.00, currency: 'DKK', pe: 44, profits: [47, 55, 83], status: 'Sain', region: 'Europe' },
-            { id: 20, name: 'Ferrari', ticker: 'RACE', sector: 'Luxe', price: 422.10, currency: '€', pe: 51, profits: [0.8, 0.9, 1.2], status: 'Sain', region: 'Europe' }
+            // --- USA: LES GEANTS ---
+            { id: 1, name: 'Apple', ticker: 'AAPL', sector: 'Tech', price: 228.4, currency: '$', pe: 31, region: 'USA', status: 'Sain' },
+            { id: 2, name: 'Microsoft', ticker: 'MSFT', sector: 'Tech', price: 415.6, currency: '$', pe: 34, region: 'USA', status: 'Sain' },
+            { id: 3, name: 'Nvidia', ticker: 'NVDA', sector: 'Semi-cond', price: 118.2, currency: '$', pe: 68, region: 'USA', status: 'Sain' },
+            { id: 4, name: 'Alphabet (Google)', ticker: 'GOOGL', sector: 'Tech', price: 165.1, currency: '$', pe: 24, region: 'USA', status: 'Sain' },
+            { id: 5, name: 'Amazon', ticker: 'AMZN', sector: 'E-com', price: 188.3, currency: '$', pe: 42, region: 'USA', status: 'Sain' },
+            { id: 6, name: 'Meta', ticker: 'META', sector: 'Tech', price: 520.4, currency: '$', pe: 28, region: 'USA', status: 'Sain' },
+            { id: 7, name: 'Tesla', ticker: 'TSLA', sector: 'Auto', price: 210.8, currency: '$', pe: 55, region: 'USA', status: 'Volatile' },
+            { id: 8, name: 'Broadcom', ticker: 'AVGO', sector: 'Semi-cond', price: 172.5, currency: '$', pe: 38, region: 'USA', status: 'Sain' },
+            { id: 9, name: 'Eli Lilly', ticker: 'LLY', sector: 'Santé', price: 885.2, currency: '$', pe: 62, region: 'USA', status: 'Croissance' },
+            { id: 10, name: 'Berkshire Hathaway', ticker: 'BRK-B', sector: 'Finance', price: 452.1, currency: '$', pe: 14, region: 'USA', status: 'Sain' },
+            
+            // --- FRANCE: PEA STARS ---
+            { id: 20, name: 'LVMH', ticker: 'MC.PA', sector: 'Luxe', price: 625.5, currency: '€', pe: 22, region: 'France', status: 'Sain' },
+            { id: 21, name: 'Hermès', ticker: 'RMS.PA', sector: 'Luxe', price: 2015.0, currency: '€', pe: 48, region: 'France', status: 'Sain' },
+            { id: 22, name: "L'Oréal", ticker: 'OR.PA', sector: 'Conso', price: 368.2, currency: '€', pe: 32, region: 'France', status: 'Sain' },
+            { id: 23, name: 'TotalEnergies', ticker: 'TTE.PA', sector: 'Energie', price: 61.4, currency: '€', pe: 8, region: 'France', status: 'Dividende' },
+            { id: 24, name: 'Air Liquide', ticker: 'AI.PA', sector: 'Industrie', price: 168.1, currency: '€', pe: 26, region: 'France', status: 'Sain' },
+            { id: 25, name: 'Schneider Electric', ticker: 'SU.PA', sector: 'Industrie', price: 224.3, currency: '€', pe: 30, region: 'France', status: 'Croissance' },
+            { id: 26, name: 'Sanofi', ticker: 'SAN.PA', sector: 'Santé', price: 91.8, currency: '€', pe: 12, region: 'France', status: 'Stable' },
+            { id: 27, name: 'Pernod Ricard', ticker: 'RI.PA', sector: 'Conso', price: 128.4, currency: '€', pe: 18, region: 'France', status: 'Alerte' },
+            { id: 28, name: 'Dassault Syst.', ticker: 'DSY.PA', sector: 'Tech', price: 34.2, currency: '€', pe: 28, region: 'France', status: 'Sain' },
+            { id: 29, name: 'BNP Paribas', ticker: 'BNP.PA', sector: 'Banque', price: 62.1, currency: '€', pe: 7, region: 'France', status: 'Dividende' },
+            
+            // --- EUROPE & AUTRES ---
+            { id: 40, name: 'ASML', ticker: 'ASML.AS', sector: 'Tech', price: 712.4, currency: '€', pe: 38, region: 'Europe', status: 'Sain' },
+            { id: 41, name: 'Novo Nordisk', ticker: 'NOVO-B', sector: 'Santé', price: 845.0, currency: 'DKK', pe: 42, region: 'Europe', status: 'Sain' },
+            { id: 42, name: 'SAP', ticker: 'SAP.DE', sector: 'Tech', price: 198.2, currency: '€', pe: 36, region: 'Europe', status: 'Croissance' },
+            { id: 43, name: 'Ferrari', ticker: 'RACE', sector: 'Luxe', price: 422.1, currency: '€', pe: 50, region: 'Europe', status: 'Sain' },
+            { id: 44, name: 'TSMC', ticker: 'TSM', sector: 'Semi-cond', price: 174.3, currency: '$', pe: 26, region: 'Monde', status: 'Sain' },
+            { id: 45, name: 'Adyen', ticker: 'ADYEN', sector: 'Fintech', price: 1250.0, currency: '€', pe: 45, region: 'Europe', status: 'Volatile' }
         ];
 
         const ETFS_DATA = [
-            { id: 101, name: 'iShares Core S&P 500', ticker: 'CSPX', emitter: 'BlackRock', price: 545.20, currency: '$', ter: 0.07, region: 'USA' },
-            { id: 102, name: 'Amundi MSCI World (PEA)', ticker: 'CW8', emitter: 'Amundi', price: 512.45, currency: '€', ter: 0.38, region: 'Monde' },
-            { id: 103, name: 'Vanguard FTSE All-World', ticker: 'VWCE', emitter: 'Vanguard', price: 121.30, currency: '€', ter: 0.22, region: 'Monde' },
-            { id: 104, name: 'Lyxor Nasdaq 100', ticker: 'UST', emitter: 'Amundi', price: 65.40, currency: '€', ter: 0.30, region: 'USA' }
+            // --- MONDE ---
+            { id: 100, name: 'Amundi MSCI World (CW8)', ticker: 'CW8', emitter: 'Amundi', price: 512.4, currency: '€', ter: 0.38, region: 'Monde', pe: 'PEA' },
+            { id: 101, name: 'iShares Core MSCI World', ticker: 'IWDA', emitter: 'BlackRock', price: 88.5, currency: '$', ter: 0.20, region: 'Monde', pe: 'CTO' },
+            { id: 102, name: 'Vanguard All-World (Dist)', ticker: 'VWRL', emitter: 'Vanguard', price: 118.2, currency: '€', ter: 0.22, region: 'Monde', pe: 'CTO' },
+            
+            // --- USA ---
+            { id: 110, name: 'BNP S&P 500 (ESE)', ticker: 'ESE', emitter: 'BNP Paribas', price: 32.1, currency: '€', ter: 0.15, region: 'USA', pe: 'PEA' },
+            { id: 111, name: 'iShares Core S&P 500', ticker: 'CSPX', emitter: 'BlackRock', price: 545.2, currency: '$', ter: 0.07, region: 'USA', pe: 'CTO' },
+            { id: 112, name: 'Lyxor Nasdaq 100 (UST)', ticker: 'UST', emitter: 'Amundi', price: 65.4, currency: '€', ter: 0.30, region: 'USA', pe: 'PEA' },
+            
+            // --- THEMATIQUES ---
+            { id: 120, name: 'L&G Cyber Security', ticker: 'ISPY', emitter: 'Legal & Gen', price: 22.5, currency: '€', ter: 0.50, region: 'Monde', pe: 'CTO' },
+            { id: 121, name: 'iShares Semi-conductors', ticker: 'SMH', emitter: 'BlackRock', price: 42.1, currency: '$', ter: 0.35, region: 'Monde', pe: 'CTO' },
+            { id: 122, name: 'Amundi Eau (Lyxor World Water)', ticker: 'WAT', emitter: 'Amundi', price: 62.3, currency: '€', ter: 0.60, region: 'Monde', pe: 'PEA' },
+            { id: 123, name: 'Vanguard Dividend Apprec.', ticker: 'VIG', emitter: 'Vanguard', price: 188.4, currency: '$', ter: 0.06, region: 'USA', pe: 'CTO' }
         ];
 
         function App() {
@@ -70,23 +102,22 @@
             };
 
             return (
-                <div className="max-w-7xl mx-auto px-6 py-10">
-                    {/* Header */}
-                    <header className="flex flex-col lg:flex-row justify-between items-center gap-8 mb-16">
+                <div className="max-w-7xl mx-auto px-4 md:px-8 py-10">
+                    <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-16">
                         <div>
-                            <h1 className="text-4xl font-black tracking-tighter mb-2">STOCKLY <span className="gradient-text italic">ANALYTICS</span></h1>
-                            <p className="text-slate-500 font-medium uppercase text-xs tracking-widest">Plateforme de comparaison interactive</p>
+                            <h1 className="text-4xl font-black tracking-tighter mb-2">STOCKLY <span className="gradient-text italic">PREMIUM</span></h1>
+                            <p className="text-slate-500 font-medium uppercase text-[10px] tracking-[0.2em]">{currentData.length} Actifs répertoriés</p>
                         </div>
 
                         <div className="flex bg-slate-900 p-1.5 rounded-2xl border border-white/5">
-                            <button onClick={() => {setActiveTab('stocks'); setComparisonList([]);}} className={`px-8 py-3 rounded-xl text-xs font-black uppercase transition-all ${activeTab === 'stocks' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400'}`}>Actions</button>
-                            <button onClick={() => {setActiveTab('etfs'); setComparisonList([]);}} className={`px-8 py-3 rounded-xl text-xs font-black uppercase transition-all ${activeTab === 'etfs' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400'}`}>ETFs</button>
+                            <button onClick={() => {setActiveTab('stocks'); setComparisonList([]);}} className={`px-8 py-3 rounded-xl text-xs font-black uppercase transition-all ${activeTab === 'stocks' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400'}`}>Actions</button>
+                            <button onClick={() => {setActiveTab('etfs'); setComparisonList([]);}} className={`px-8 py-3 rounded-xl text-xs font-black uppercase transition-all ${activeTab === 'etfs' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400'}`}>ETFs (Fonds)</button>
                         </div>
 
-                        <div className="flex gap-4 w-full lg:w-auto">
+                        <div className="flex flex-wrap gap-4 w-full lg:w-auto">
                             <select 
                                 onChange={(e) => setRegionFilter(e.target.value)}
-                                className="bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-500"
+                                className="bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-500 cursor-pointer"
                             >
                                 <option value="Tous">Toutes Régions</option>
                                 <option value="USA">USA</option>
@@ -96,33 +127,36 @@
                             </select>
                             <input 
                                 type="text" 
-                                placeholder="Rechercher ticker..." 
-                                className="bg-slate-900 border border-white/10 rounded-2xl px-6 py-3 outline-none focus:border-indigo-500 flex-grow"
+                                placeholder="Apple, LVMH, Nvidia..." 
+                                className="bg-slate-900 border border-white/10 rounded-2xl px-6 py-3 outline-none focus:border-indigo-500 flex-grow lg:w-64"
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </div>
                     </header>
 
-                    {/* Zone Duel */}
                     {comparisonList.length > 0 && (
-                        <div className="mb-12 p-8 glass rounded-[2.5rem] border-2 border-indigo-500/30 animate-in">
-                            <div className="flex justify-between items-center mb-8">
-                                <h2 className="text-xl font-black uppercase italic tracking-tighter">Comparaison Active</h2>
-                                <button onClick={() => setComparisonList([])} className="text-xs font-bold text-indigo-400 hover:text-white">EFFACER</button>
+                        <div className="mb-12 p-8 glass rounded-[3rem] border-2 border-indigo-500/50 animate-pulse-subtle">
+                            <div className="flex justify-between items-center mb-10">
+                                <h2 className="text-2xl font-black uppercase italic tracking-tighter text-indigo-400">Duel Expert</h2>
+                                <button onClick={() => setComparisonList([])} className="bg-white/10 hover:bg-white/20 px-6 py-2 rounded-full text-[10px] font-black uppercase transition-all">Tout réinitialiser</button>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                 {comparisonList.map(item => (
-                                    <div key={item.id} className="bg-white/5 p-6 rounded-3xl relative">
-                                        <div className="text-[10px] font-black text-indigo-400 mb-1 uppercase tracking-widest">{item.ticker}</div>
-                                        <h3 className="text-xl font-bold mb-4">{item.name}</h3>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="bg-black/20 p-3 rounded-xl text-center">
-                                                <div className="text-[9px] text-slate-500 uppercase font-black">Prix</div>
-                                                <div className="text-lg font-bold">{item.price}{item.currency}</div>
+                                    <div key={item.id} className="bg-white/5 p-8 rounded-[2rem] border border-white/5">
+                                        <div className="text-[10px] font-black text-indigo-400 mb-2 uppercase tracking-[0.2em]">{item.ticker}</div>
+                                        <h3 className="text-3xl font-black mb-8">{item.name}</h3>
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between p-4 bg-black/20 rounded-2xl">
+                                                <span className="text-xs text-slate-500 font-bold uppercase">Prix Live</span>
+                                                <span className="font-black text-lg">{item.price}{item.currency}</span>
                                             </div>
-                                            <div className="bg-black/20 p-3 rounded-xl text-center">
-                                                <div className="text-[9px] text-slate-500 uppercase font-black">{activeTab === 'stocks' ? 'P/E Ratio' : 'Frais (TER)'}</div>
-                                                <div className="text-lg font-bold">{activeTab === 'stocks' ? item.pe+'x' : item.ter+'%'}</div>
+                                            <div className="flex justify-between p-4 bg-black/20 rounded-2xl">
+                                                <span className="text-xs text-slate-500 font-bold uppercase">{activeTab === 'stocks' ? 'Valorisation (P/E)' : 'Frais (TER)'}</span>
+                                                <span className="font-black text-lg text-indigo-400">{activeTab === 'stocks' ? item.pe+'x' : item.ter+'%'}</span>
+                                            </div>
+                                            <div className="flex justify-between p-4 bg-black/20 rounded-2xl">
+                                                <span className="text-xs text-slate-500 font-bold uppercase">Enveloppe</span>
+                                                <span className="font-black text-xs bg-indigo-500/20 px-3 py-1 rounded-lg uppercase">{activeTab === 'stocks' ? (item.region === 'France' || item.region === 'Europe' ? 'PEA Eligible' : 'CTO Uni.') : item.pe}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -131,31 +165,37 @@
                         </div>
                     )}
 
-                    {/* Grille Principale */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filtered.map(item => {
                             const isSelected = comparisonList.find(i => i.id === item.id);
                             return (
-                                <div key={item.id} className={`glass p-6 rounded-[2rem] transition-all hover:scale-[1.02] ${isSelected ? 'card-active' : ''}`}>
+                                <div key={item.id} className={`glass p-6 rounded-[2.5rem] transition-all hover:bg-slate-800/80 group ${isSelected ? 'card-active scale-95 opacity-50' : 'hover:-translate-y-2'}`}>
                                     <div className="flex justify-between items-start mb-6">
-                                        <span className="text-[10px] font-black bg-white/5 px-3 py-1 rounded-lg text-slate-400 uppercase tracking-tighter">{item.ticker}</span>
+                                        <div className="px-3 py-1 rounded-lg bg-white/5 text-[10px] font-black text-slate-500 group-hover:text-indigo-400 transition-colors uppercase tracking-widest">{item.ticker}</div>
                                         <button 
                                             onClick={() => toggleCompare(item)}
-                                            className={`p-2 rounded-xl transition-all ${isSelected ? 'bg-indigo-600 text-white' : 'bg-white/5 text-slate-500 hover:text-white'}`}
+                                            className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isSelected ? 'bg-indigo-600 text-white' : 'bg-white/5 text-slate-500 hover:bg-indigo-600 hover:text-white'}`}
                                         >
                                             {isSelected ? '✓' : '+'}
                                         </button>
                                     </div>
-                                    <h4 className="text-lg font-bold mb-1">{item.name}</h4>
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase mb-6">{activeTab === 'stocks' ? item.sector : item.emitter} • {item.region}</p>
-                                    <div className="flex justify-between items-end border-t border-white/5 pt-4">
+                                    <h4 className="text-xl font-black mb-1 truncate">{item.name}</h4>
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase mb-8 tracking-wider italic">
+                                        {activeTab === 'stocks' ? item.sector : item.emitter} • {item.region}
+                                    </p>
+                                    <div className="flex justify-between items-end border-t border-white/5 pt-5">
                                         <div>
-                                            <p className="text-[9px] text-slate-500 uppercase font-black">Dernier Prix</p>
-                                            <p className="text-2xl font-black">{item.price}<span className="text-indigo-500 text-sm ml-1">{item.currency}</span></p>
+                                            <p className="text-[9px] text-slate-600 uppercase font-black mb-1">Cote actuelle</p>
+                                            <p className="text-2xl font-black">{item.price}<span className="text-indigo-500 text-sm ml-1 font-bold">{item.currency}</span></p>
                                         </div>
                                         {activeTab === 'stocks' && (
-                                            <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${item.status === 'Sain' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                                            <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase ${item.status === 'Sain' || item.status === 'Croissance' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
                                                 {item.status}
+                                            </div>
+                                        )}
+                                        {activeTab === 'etfs' && (
+                                            <div className="px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 text-[9px] font-black uppercase">
+                                                {item.pe}
                                             </div>
                                         )}
                                     </div>
