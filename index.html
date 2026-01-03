@@ -2,131 +2,35 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STOCKLY - Analyse Actions & ETF</title>
-    
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>STOCKLY - Chargement...</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { background-color: #f1f5f9; font-family: sans-serif; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="p-8">
+    <div class="max-w-2xl mx-auto text-center">
+        <h1 class="text-3xl font-black text-slate-900 mb-8">STOCKLY</h1>
+        
+        <div id="content" class="space-y-4 text-left">
+            <div class="card border-l-4 border-indigo-500">
+                <h2 class="font-bold text-lg">Apple (AAPL)</h2>
+                <p class="text-slate-500">Prix: 228.40 $ • Secteur: Tech</p>
+            </div>
+            
+            <div class="card border-l-4 border-indigo-500">
+                <h2 class="font-bold text-lg">LVMH (MC.PA)</h2>
+                <p class="text-slate-500">Prix: 625.50 € • Secteur: Luxe</p>
+            </div>
 
-    <script type="text/babel">
-        const { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, Search, Activity, Plus, X, Globe, DollarSign, ShieldCheck, Zap } = lucide;
+            <div class="card border-l-4 border-emerald-500">
+                <h2 class="font-bold text-lg">S&P 500 (CSPX)</h2>
+                <p class="text-slate-500">Frais: 0.07% • ETF Indice</p>
+            </div>
+        </div>
 
-        const STOCKS_DATA = [
-            { id: 1, name: 'Apple', ticker: 'AAPL', price: 228.40, currency: '$', region: 'USA', status: 'Sain' },
-            { id: 2, name: 'LVMH', ticker: 'MC.PA', price: 625.50, currency: '€', region: 'France', status: 'Sain' },
-            { id: 11, name: 'Nvidia', ticker: 'NVDA', price: 118.20, currency: '$', region: 'USA', status: 'Sain' }
-        ];
-
-        const ETFS_DATA = [
-            { id: 101, name: 'iShares Core S&P 500', ticker: 'CSPX', price: 545.20, currency: '$', ter: 0.07, region: 'USA' },
-            { id: 102, name: 'Amundi MSCI World', ticker: 'CW8', price: 512.45, currency: '€', ter: 0.38, region: 'Monde' }
-        ];
-
-        const App = () => {
-            const [activeTab, setActiveTab] = React.useState('stocks');
-            const [search, setSearch] = React.useState('');
-
-            const data = activeTab === 'stocks' ? STOCKS_DATA : ETFS_DATA;
-            const filtered = data.filter(item => 
-                item.name.toLowerCase().includes(search.toLowerCase()) || 
-                item.ticker.toLowerCase().includes(search.toLowerCase())
-            );
-
-            return (
-                <div className="min-h-screen">
-                    <nav className="bg-white border-b p-6 shadow-sm sticky top-0 z-50">
-                        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-2 font-black text-2xl text-slate-900">
-                                <Activity className="text-indigo-600" strokeWidth={3} /> STOCKLY
-                            </div>
-                            <div className="relative w-full md:w-64">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <input 
-                                    type="text" 
-                                    placeholder="Rechercher..." 
-                                    className="w-full pl-10 pr-4 py-2 bg-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                                    onChange={(e) => setSearch(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </nav>
-
-                    <main className="max-w-5xl mx-auto p-6">
-                        <div className="flex bg-slate-200 p-1 rounded-xl w-fit mb-8">
-                            <button 
-                                onClick={() => setActiveTab('stocks')}
-                                className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${activeTab === 'stocks' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500'}`}
-                            >
-                                Actions
-                            </button>
-                            <button 
-                                onClick={() => setActiveTab('etfs')}
-                                className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${activeTab === 'etfs' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500'}`}
-                            >
-                                ETF (Fonds)
-                            </button>
-                        </div>
-
-                        <div className="grid gap-4">
-                            {filtered.map(item => (
-                                <div key={item.id} className="bg-white p-6 rounded-3xl border border-slate-200 flex items-center justify-between hover:shadow-xl transition-all group">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black text-xs border border-indigo-100 uppercase">
-                                            {item.ticker.substring(0,3)}
-                                        </div>
-                                        <div>
-                                            <h3 className="font-black text-slate-900">{item.name}</h3>
-                                            <p className="text-xs text-slate-500 font-bold uppercase">{item.ticker} • {item.region}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-6">
-                                        <div className="text-right">
-                                            <div className="font-black text-slate-900">{item.price.toLocaleString()} {item.currency}</div>
-                                            {item.ter && <div className="text-[10px] font-bold text-emerald-600 uppercase">Frais: {item.ter}%</div>}
-                                        </div>
-                                        <button className="p-3 rounded-2xl bg-slate-50 text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                            <Plus size={20} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </main>
-
-                    <footer className="max-w-5xl mx-auto px-6 mt-12 grid md:grid-cols-3 gap-6 pb-20">
-                        <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-                            <Zap className="text-orange-500 mb-4" />
-                            <h4 className="font-black text-xs uppercase mb-2">Performance</h4>
-                            <p className="text-xs text-slate-500 leading-relaxed">Analysez les tendances de croissance en un coup d'œil.</p>
-                        </div>
-                        <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-                            <ShieldCheck className="text-emerald-500 mb-4" />
-                            <h4 className="font-black text-xs uppercase mb-2">Sécurité</h4>
-                            <p className="text-xs text-slate-500 leading-relaxed">Vérification de la santé financière des entreprises.</p>
-                        </div>
-                        <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-                            <DollarSign className="text-indigo-500 mb-4" />
-                            <h4 className="font-black text-xs uppercase mb-2">Dividendes</h4>
-                            <p className="text-xs text-slate-500 leading-relaxed">Suivez les revenus passifs générés par vos actifs.</p>
-                        </div>
-                    </footer>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+        <p class="mt-10 text-slate-400 text-sm">Si vous voyez ces cartes, votre GitHub fonctionne. <br> Actualisez dans 2 minutes pour la version interactive.</p>
+    </div>
 </body>
 </html>
