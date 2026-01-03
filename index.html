@@ -3,104 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STOCKLY - Analyse Expert</title>
+    <title>STOCKLY - Analyse Interactive</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .stock-card:hover { transform: translateY(-2px); border-color: #6366f1; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .active-tab { background: #6366f1; color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-5xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/20">
-                    <i data-lucide="activity" class="text-white"></i>
-                </div>
-                <h1 class="text-2xl font-900 tracking-tighter uppercase">Stockly <span class="text-indigo-500 text-xs font-bold">PRO</span></h1>
-            </div>
-            <div class="relative w-full md:w-80">
-                <input type="text" id="searchInput" placeholder="Rechercher une action ou un ticker..." 
-                    class="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                <i data-lucide="search" class="absolute left-4 top-3.5 text-slate-500" size="18"></i>
-            </div>
-        </div>
+<body>
+    <div id="root"></div>
 
-        <div class="flex gap-2 mb-8 overflow-x-auto pb-2">
-            <button class="px-6 py-2 bg-indigo-600 rounded-full text-xs font-bold whitespace-nowrap">TOUT</button>
-            <button class="px-6 py-2 bg-slate-800 hover:bg-slate-700 rounded-full text-xs font-bold text-slate-400 whitespace-nowrap">USA</button>
-            <button class="px-6 py-2 bg-slate-800 hover:bg-slate-700 rounded-full text-xs font-bold text-slate-400 whitespace-nowrap">FRANCE</button>
-            <button class="px-6 py-2 bg-slate-800 hover:bg-slate-700 rounded-full text-xs font-bold text-slate-400 whitespace-nowrap">EUROPE</button>
-        </div>
+    <script type="text/babel">
+        const { Search, Activity, Plus, X, ArrowRightLeft, CheckCircle2, TrendingUp, TrendingDown } = lucide;
 
-        <div id="stockGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            </div>
-    </div>
-
-    <script>
-        // TA BASE DE DONNÉES RÉCUPÉRÉE DE TES IMAGES
-        const STOCKS = [
-            { id: 1, name: 'Apple', ticker: 'AAPL', sector: 'Tech', price: 228.40, currency: '$', status: 'Sain', region: 'USA' },
-            { id: 10, name: 'Microsoft', ticker: 'MSFT', sector: 'Tech', price: 415.60, currency: '$', status: 'Sain', region: 'USA' },
-            { id: 11, name: 'Nvidia', ticker: 'NVDA', sector: 'Tech', price: 118.20, currency: '$', status: 'Sain', region: 'USA' },
-            { id: 13, name: 'Alphabet', ticker: 'GOOGL', sector: 'Tech', price: 165.10, currency: '$', status: 'Sain', region: 'USA' },
-            { id: 33, name: 'Amazon', ticker: 'AMZN', sector: 'Tech', price: 188.30, currency: '$', status: 'Sain', region: 'USA' },
-            { id: 4, name: 'Coca-Cola', ticker: 'KO', sector: 'Conso', price: 68.10, currency: '$', status: 'Sain', region: 'USA' },
-            { id: 2, name: 'LVMH', ticker: 'MC.PA', sector: 'Luxe', price: 625.50, currency: '€', status: 'Sain', region: 'France' },
-            { id: 12, name: 'Hermès', ticker: 'RMS.PA', sector: 'Luxe', price: 2015.00, currency: '€', status: 'Sain', region: 'France' },
-            { id: 17, name: 'L\'Oréal', ticker: 'OR.PA', sector: 'Conso', price: 368.20, currency: '€', status: 'Sain', region: 'France' },
-            { id: 8, name: 'TotalEnergies', ticker: 'TTE.PA', sector: 'Energie', price: 61.40, currency: '€', status: 'Sain', region: 'France' },
-            { id: 7, name: 'Air Liquide', ticker: 'AI.PA', sector: 'Industrie', price: 168.15, currency: '€', status: 'Sain', region: 'France' },
-            { id: 21, name: 'Novo Nordisk', ticker: 'NOVO-B', sector: 'Santé', price: 845.00, currency: 'DKK', status: 'Sain', region: 'Europe' },
-            { id: 15, name: 'ASML', ticker: 'ASML', sector: 'Semi', price: 712.40, currency: '€', status: 'Sain', region: 'Europe' },
-            { id: 101, name: 'iShares S&P 500', ticker: 'CSPX', sector: 'ETF', price: 545.20, currency: '$', status: 'Indice', region: 'USA' },
-            { id: 102, name: 'Amundi MSCI World', ticker: 'CW8', sector: 'ETF', price: 512.45, currency: '€', status: 'Indice', region: 'Monde' }
+        // --- TA BASE DE DONNÉES COMPLÈTE ---
+        const STOCKS_DATA = [
+            { id: 1, name: 'Apple', ticker: 'AAPL', sector: 'Tech', price: 228.40, currency: '$', pe: 28, profits: [94, 99, 100], status: 'Sain' },
+            { id: 10, name: 'Microsoft', ticker: 'MSFT', sector: 'Tech', price: 415.60, currency: '$', pe: 36, profits: [61, 72, 88], status: 'Sain' },
+            { id: 11, name: 'Nvidia', ticker: 'NVDA', sector: 'Tech', price: 118.20, currency: '$', pe: 72, profits: [4, 9, 29], status: 'Sain' },
+            { id: 2, name: 'LVMH', ticker: 'MC.PA', sector: 'Luxe', price: 625.50, currency: '€', pe: 24, profits: [12, 14, 15], status: 'Sain' },
+            { id: 12, name: 'Hermès', ticker: 'RMS.PA', sector: 'Luxe', price: 2015.0, currency: '€', pe: 52, profits: [2, 3, 4], status: 'Sain' }
         ];
 
-        function renderStocks(filter = '') {
-            const grid = document.getElementById('stockGrid');
-            grid.innerHTML = '';
-            
-            const filtered = STOCKS.filter(s => 
-                s.name.toLowerCase().includes(filter.toLowerCase()) || 
-                s.ticker.toLowerCase().includes(filter.toLowerCase())
+        const ETFS_DATA = [
+            { id: 101, name: 'iShares S&P 500', ticker: 'CSPX', emitter: 'BlackRock', price: 545.20, currency: '$', ter: 0.07, region: 'USA' },
+            { id: 102, name: 'Amundi MSCI World', ticker: 'CW8', emitter: 'Amundi', price: 512.45, currency: '€', ter: 0.38, region: 'Monde' }
+        ];
+
+        const App = () => {
+            const [activeTab, setActiveTab] = React.useState('stocks');
+            const [search, setSearch] = React.useState('');
+            const [comparison, setComparison] = React.useState([]);
+
+            const data = activeTab === 'stocks' ? STOCKS_DATA : ETFS_DATA;
+            const filtered = data.filter(item => 
+                item.name.toLowerCase().includes(search.toLowerCase()) || 
+                item.ticker.toLowerCase().includes(search.toLowerCase())
             );
 
-            filtered.forEach(stock => {
-                const card = document.createElement('div');
-                card.className = 'glass p-5 rounded-[2rem] stock-card transition-all cursor-pointer';
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="bg-slate-700/50 px-3 py-1 rounded-lg text-[10px] font-black text-indigo-400 uppercase tracking-widest">${stock.ticker}</div>
-                        <div class="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md italic">${stock.status}</div>
-                    </div>
-                    <h3 class="text-lg font-black mb-1">${stock.name}</h3>
-                    <p class="text-xs text-slate-500 mb-4">${stock.sector} • ${stock.region}</p>
-                    <div class="flex justify-between items-end border-t border-slate-700/50 pt-4">
-                        <div>
-                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Prix Live</p>
-                            <p class="text-xl font-900">${stock.price.toLocaleString()} <span class="text-indigo-500 text-sm">${stock.currency}</span></p>
-                        </div>
-                        <div class="bg-indigo-600/10 p-2 rounded-xl text-indigo-500">
-                            <i data-lucide="plus" size="18"></i>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-            lucide.createIcons();
-        }
+            const toggleCompare = (item) => {
+                if (comparison.find(i => i.id === item.id)) {
+                    setComparison(comparison.filter(i => i.id !== item.id));
+                } else if (comparison.length < 2) {
+                    setComparison([...comparison, item]);
+                }
+            };
 
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            renderStocks(e.target.value);
-        });
+            return (
+                <div className="min-h-screen p-4 md:p-8">
+                    {/* Header */}
+                    <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+                        <div className="flex items-center gap-3">
+                            <Activity className="text-indigo-500" size={32} strokeWidth={3} />
+                            <h1 className="text-2xl font-900 tracking-tighter uppercase">Stockly <span className="text-indigo-500">PRO</span></h1>
+                        </div>
+                        
+                        <div className="flex bg-slate-800 p-1 rounded-2xl border border-slate-700">
+                            <button onClick={() => {setActiveTab('stocks'); setComparison([]);}} className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${activeTab === 'stocks' ? 'active-tab' : 'text-slate-400'}`}>ACTIONS</button>
+                            <button onClick={() => {setActiveTab('etfs'); setComparison([]);}} className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${activeTab === 'etfs' ? 'active-tab' : 'text-slate-400'}`}>ETF</button>
+                        </div>
 
-        // Initialisation
-        renderStocks();
-        lucide.createIcons();
+                        <div className="relative w-full md:w-64">
+                            <Search className="absolute left-4 top-3 text-slate-500" size={18} />
+                            <input onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Rechercher..." className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-2.5 pl-12 pr-4 text-sm outline-none focus:border-indigo-500" />
+                        </div>
+                    </div>
+
+                    {/* Zone Duel / Comparaison */}
+                    {comparison.length > 0 && (
+                        <div className="max-w-6xl mx-auto mb-10 animate-fade-in">
+                            <div className="glass rounded-[2.5rem] p-8 border-2 border-indigo-500/50">
+                                <div className="flex justify-between items-center mb-8">
+                                    <h2 className="text-xl font-900 uppercase italic flex items-center gap-2">
+                                        <ArrowRightLeft className="text-indigo-500" /> Duel Indicatif
+                                    </h2>
+                                    <button onClick={() => setComparison([])} className="text-slate-500 hover:text-white"><X /></button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {comparison.map(item => (
+                                        <div key={item.id} className="bg-slate-900/50 p-6 rounded-3xl border border-slate-700">
+                                            <div className="text-indigo-500 font-black text-xs mb-2 uppercase tracking-widest">{item.ticker}</div>
+                                            <div className="text-2xl font-900 mb-6">{item.name}</div>
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between py-2 border-b border-slate-800"><span className="text-slate-500 text-sm">Prix</span><span className="font-bold">{item.price} {item.currency}</span></div>
+                                                {activeTab === 'stocks' ? (
+                                                    <div className="flex justify-between py-2 border-b border-slate-800"><span className="text-slate-500 text-sm">P/E Ratio</span><span className="text-emerald-400 font-bold">{item.pe}x</span></div>
+                                                ) : (
+                                                    <div className="flex justify-between py-2 border-b border-slate-800"><span className="text-slate-500 text-sm">Frais (TER)</span><span className="text-emerald-400 font-bold">{item.ter}%</span></div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Grille principale */}
+                    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filtered.map(item => (
+                            <div key={item.id} className="glass p-6 rounded-[2rem] hover:border-indigo-500 transition-all group">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500 font-black text-xs border border-indigo-500/20">{item.ticker.substring(0,3)}</div>
+                                    <button 
+                                        onClick={() => toggleCompare(item)}
+                                        className={`p-3 rounded-xl transition-all ${comparison.find(i => i.id === item.id) ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-500 hover:text-indigo-400'}`}
+                                    >
+                                        <Plus size={20} />
+                                    </button>
+                                </div>
+                                <h3 className="text-lg font-900 mb-1">{item.name}</h3>
+                                <p className="text-xs text-slate-500 mb-6 font-bold uppercase tracking-wider">{item.ticker} • {activeTab === 'stocks' ? item.sector : item.region}</p>
+                                <div className="flex justify-between items-end border-t border-slate-700/50 pt-5">
+                                    <div>
+                                        <p className="text-[10px] text-slate-500 font-black uppercase mb-1">Prix Actuel</p>
+                                        <p className="text-xl font-900 tracking-tighter">{item.price.toLocaleString()} <span className="text-indigo-500 text-sm">{item.currency}</span></p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] text-slate-500 font-black uppercase mb-1">{activeTab === 'stocks' ? 'Santé' : 'Frais'}</p>
+                                        <p className="text-sm font-bold text-emerald-500">{activeTab === 'stocks' ? item.status : item.ter + '%'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+        // Initialisation des icônes Lucide après le rendu React
+        setTimeout(() => lucide.createIcons(), 500);
     </script>
 </body>
 </html>
