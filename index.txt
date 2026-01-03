@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOCKLY - Dashboard</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: white; margin: 0; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; transition: all 0.3s ease; }
+        .glass-card:hover { transform: translateY(-4px); border-color: #6366f1; }
+        .active-tab { background: #6366f1; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const DATA = [
+            { id: 1, name: 'Apple', ticker: 'AAPL', price: 228.4, currency: '$', type: 'action' },
+            { id: 2, name: 'LVMH', ticker: 'MC.PA', price: 625.5, currency: '€', type: 'action' },
+            { id: 3, name: 'Nvidia', ticker: 'NVDA', price: 118.2, currency: '$', type: 'action' },
+            { id: 4, name: 'S&P 500', ticker: 'CSPX', price: 545.2, currency: '$', type: 'etf' }
+        ];
+
+        function App() {
+            const [filter, setFilter] = useState('action');
+            const [search, setSearch] = useState('');
+            const [selected, setSelected] = useState([]);
+
+            const filteredData = DATA.filter(item => 
+                item.type === filter && 
+                (item.name.toLowerCase().includes(search.toLowerCase()) || item.ticker.toLowerCase().includes(search.toLowerCase()))
+            );
+
+            const toggleSelect = (id) => {
+                if (selected.includes(id)) {
+                    setSelected(selected.filter(i => i !== id));
+                } else if (selected.length < 2) {
+                    setSelected([...selected, id]);
+                }
+            };
+
+            return (
+                <div className="min-h-screen p-6 md:p-12">
+                    {/* HEADER */}
+                    <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+                        <h1 className="text-3xl font-extrabold tracking-tighter">STOCKLY<span className="text-indigo-500">PRO</span></h1>
+                        
+                        <div className="flex bg-slate-800 p-1.5 rounded-2xl border border-slate-700">
+                            <button onClick={() => setFilter('action')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${filter === 'action' ? 'active-tab' : 'text-slate-400'}`}>Actions</button>
+                            <button onClick={() => setFilter('etf')} className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${filter === 'etf' ? 'active-tab' : 'text-slate-400'}`}>ETF</button>
+                        </div>
+
+                        <input 
+                            type="text" 
+                            placeholder="Rechercher..." 
+                            className="bg-slate-800 border border-slate-700 rounded-2xl px-6 py-3 outline-none focus:border-indigo-500 w-full md:w-64"
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+
+                    {/* GRILLE INTERACTIVE */}
+                    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filteredData.map(item => (
+                            <div key={item.id} className={`glass-card p-8 ${selected.includes(item.id) ? 'ring-2 ring-indigo-500' : ''}`}>
+                                <div className="flex justify-between items-start mb-6">
+                                    <span className="text-[10px] font-black bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-lg uppercase">{item.ticker}</span>
+                                    <button 
+                                        onClick={() => toggleSelect(item.id)}
+                                        className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold transition-all ${selected.includes(item.id) ? 'bg-indigo-600' : 'bg-slate-700 hover:bg-slate-600'}`}
+                                    >
+                                        {selected.includes(item.id) ? '✓' : '+'}
+                                    </button>
+                                </div>
+                                <h3 className="text-2xl font-bold mb-2">{item.name}</h3>
+                                <div className="text-3xl font-black text-white mt-4">
+                                    {item.price} <span className="text-indigo-400 text-lg">{item.currency}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* BARRE DE COMPARAISON FLOTTANTE */}
+                    {selected.length > 0 && (
+                        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-indigo-600 px-8 py-4 rounded-full shadow-2xl flex items-center gap-6 animate-bounce">
+                            <p className="font-bold text-sm">{selected.length} actif(s) sélectionné(s)</p>
+                            <button onClick={() => setSelected([])} className="bg-white/20 hover:bg-white/40 px-4 py-1 rounded-lg text-xs font-bold">Réinitialiser</button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
