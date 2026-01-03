@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STOCKLY PRO - Base de Données Étendue</title>
+    <title>STOCKLY ULTIMATE - Analyse 200+ Actifs</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -12,10 +12,12 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b101a; color: white; margin: 0; }
         .row-hover:hover { background: rgba(99, 102, 241, 0.04); }
-        .glass-header { background: rgba(11, 16, 26, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .badge { font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
-        .badge-pea { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .glass-header { background: rgba(11, 16, 26, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .badge { font-size: 9px; font-weight: 800; padding: 2px 10px; border-radius: 6px; text-transform: uppercase; }
         .badge-sain { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-croissance { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .badge-stable { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge-alerte { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
     </style>
 </head>
 <body>
@@ -25,25 +27,34 @@
         const { useState, useMemo } = React;
 
         const DATA = [
-            // --- NOUVELLES ACTIONS DEMANDÉES ---
-            { id: 50, name: 'Air Liquide', ticker: 'AI.PA', zone: 'FRANCE', price: 168.10, currency: '€', type: 'action', quality: 'SAIN', info: 'Industrie / Gaz' },
-            { id: 51, name: 'Sanofi', ticker: 'SAN.PA', zone: 'FRANCE', price: 91.85, currency: '€', type: 'action', quality: 'STABLE', info: 'Santé / Pharma' },
-            { id: 52, name: 'Vinci', ticker: 'DG.PA', zone: 'FRANCE', price: 104.20, currency: '€', type: 'action', quality: 'SAIN', info: 'BTP / Concessions' },
-            { id: 53, name: 'InPost', ticker: 'INP.AS', zone: 'EUROPE', price: 15.40, currency: '€', type: 'action', quality: 'CROISSANCE', info: 'Logistique / E-com' },
-            { id: 54, name: 'ASML', ticker: 'ASML.AS', zone: 'EUROPE', price: 712.40, currency: '€', type: 'action', quality: 'SAIN', info: 'Semi-conducteurs' },
-            { id: 55, name: 'Schneider Electric', ticker: 'SU.PA', zone: 'FRANCE', price: 224.30, currency: '€', type: 'action', quality: 'SAIN', info: 'Énergie / Industrie' },
-            
-            // --- NOUVEAUX ETFS DEMANDÉS ---
-            { id: 200, name: 'S&P 500 (ESE)', ticker: 'ESE', zone: 'USA', price: 32.15, currency: '€', type: 'etf', quality: 'PEA', info: 'Frais: 0.15%' },
-            { id: 201, name: 'Stoxx Europe 600', ticker: 'LYP6', zone: 'EUROPE', price: 112.50, currency: '€', type: 'etf', quality: 'PEA', info: 'Frais: 0.07%' },
-            { id: 202, name: 'Emerging Markets', ticker: 'PAEEM', zone: 'EMERGING', price: 5.12, currency: '€', type: 'etf', quality: 'PEA', info: 'Frais: 0.20%' },
-            { id: 203, name: 'MSCI World Swap PEA', ticker: 'CW8', zone: 'MONDE', price: 512.45, currency: '€', type: 'etf', quality: 'PEA', info: 'Frais: 0.38%' },
-            { id: 204, name: 'iShares MSCI Emerging', ticker: 'EIMI', zone: 'EMERGING', price: 32.80, currency: '$', type: 'etf', quality: 'CTO', info: 'Frais: 0.18%' },
-
-            // --- MAGNIFICENT 7 (Rappel) ---
-            { id: 1, name: 'Apple', ticker: 'AAPL', zone: 'USA', price: 228.40, currency: '$', type: 'action', quality: 'SAIN', info: 'Tech' },
+            // --- ACTIONS (TES ACTIONS + NOUVELLES) ---
+            { id: 1, name: 'Apple', ticker: 'AAPL', zone: 'USA', price: 228.40, currency: '$', type: 'action', quality: 'SAIN', info: 'Tech / Smartphone' },
             { id: 2, name: 'Nvidia', ticker: 'NVDA', zone: 'USA', price: 118.20, currency: '$', type: 'action', quality: 'SAIN', info: 'IA / GPU' },
-            { id: 3, name: 'Microsoft', ticker: 'MSFT', zone: 'USA', price: 415.60, currency: '$', type: 'action', quality: 'SAIN', info: 'Software' }
+            { id: 3, name: 'Microsoft', ticker: 'MSFT', zone: 'USA', price: 415.60, currency: '$', type: 'action', quality: 'SAIN', info: 'Cloud / Soft' },
+            { id: 50, name: 'Air Liquide', ticker: 'AI.PA', zone: 'FRANCE', price: 168.10, currency: '€', type: 'action', quality: 'SAIN', info: 'Gaz Industriels' },
+            { id: 51, name: 'Sanofi', ticker: 'SAN.PA', zone: 'FRANCE', price: 91.85, currency: '€', type: 'action', quality: 'STABLE', info: 'Pharma' },
+            { id: 52, name: 'Vinci', ticker: 'DG.PA', zone: 'FRANCE', price: 104.20, currency: '€', type: 'action', quality: 'SAIN', info: 'Concessions' },
+            { id: 55, name: 'Schneider Electric', ticker: 'SU.PA', zone: 'FRANCE', price: 224.30, currency: '€', type: 'action', quality: 'CROISSANCE', info: 'Gestion Énergie' },
+            { id: 53, name: 'InPost', ticker: 'INP.AS', zone: 'EUROPE', price: 15.40, currency: '€', type: 'action', quality: 'CROISSANCE', info: 'Logistique' },
+            { id: 54, name: 'ASML', ticker: 'ASML.AS', zone: 'EUROPE', price: 712.40, currency: '€', type: 'action', quality: 'SAIN', info: 'Lithographie' },
+            { id: 60, name: 'LVMH', ticker: 'MC.PA', zone: 'FRANCE', price: 625.50, currency: '€', type: 'action', quality: 'SAIN', info: 'Luxe / Mode' },
+            { id: 61, name: "L'Oréal", ticker: 'OR.PA', zone: 'FRANCE', price: 368.20, currency: '€', type: 'action', quality: 'SAIN', info: 'Cosmétique' },
+            { id: 62, name: 'TotalEnergies', ticker: 'TTE.PA', zone: 'FRANCE', price: 61.40, currency: '€', type: 'action', quality: 'STABLE', info: 'Énergie / Pétrole' },
+            { id: 63, name: 'Ferrari', ticker: 'RACE', zone: 'EUROPE', price: 422.10, currency: '€', type: 'action', quality: 'SAIN', info: 'Luxe Automobile' },
+            { id: 64, name: 'Dassault Systèmes', ticker: 'DSY.PA', zone: 'FRANCE', price: 34.20, currency: '€', type: 'action', quality: 'SAIN', info: 'Logiciels 3D' },
+            { id: 65, name: 'Tesla', ticker: 'TSLA', zone: 'USA', price: 210.80, currency: '$', type: 'action', quality: 'ALERTE', info: 'Auto / Électrique' },
+            { id: 66, name: 'Hermès', ticker: 'RMS.PA', zone: 'FRANCE', price: 2015.00, currency: '€', type: 'action', quality: 'SAIN', info: 'Luxe Ultime' },
+
+            // --- ETFS (TES ETFS + NOUVEAUX) ---
+            { id: 200, name: 'S&P 500 (ESE)', ticker: 'ESE', zone: 'USA', price: 32.15, currency: '€', type: 'etf', quality: 'SAIN', info: 'PEA • Frais: 0.15%' },
+            { id: 203, name: 'MSCI World Swap PEA', ticker: 'CW8', zone: 'MONDE', price: 512.45, currency: '€', type: 'etf', quality: 'SAIN', info: 'PEA • Frais: 0.38%' },
+            { id: 201, name: 'Stoxx Europe 600', ticker: 'LYP6', zone: 'EUROPE', price: 112.50, currency: '€', type: 'etf', quality: 'STABLE', info: 'PEA • Frais: 0.07%' },
+            { id: 202, name: 'Emerging Markets PEA', ticker: 'PAEEM', zone: 'EMERGING', price: 5.12, currency: '€', type: 'etf', quality: 'ALERTE', info: 'PEA • Frais: 0.20%' },
+            { id: 204, name: 'iShares MSCI Emerging', ticker: 'EIMI', zone: 'EMERGING', price: 32.80, currency: '$', type: 'etf', quality: 'STABLE', info: 'CTO • Frais: 0.18%' },
+            { id: 210, name: 'Nasdaq 100 PEA', ticker: 'PUST', zone: 'USA', price: 42.80, currency: '€', type: 'etf', quality: 'CROISSANCE', info: 'PEA • Frais: 0.30%' },
+            { id: 211, name: 'Lyxor World Water', ticker: 'WAT', zone: 'MONDE', price: 62.30, currency: '€', type: 'etf', quality: 'SAIN', info: 'PEA • Thématique Eau' },
+            { id: 212, name: 'iShares Global Luxury', ticker: 'GLUX', zone: 'MONDE', price: 185.20, currency: '€', type: 'etf', quality: 'STABLE', info: 'CTO • Secteur Luxe' },
+            { id: 213, name: 'iShares Cyber Security', ticker: 'ISPY', zone: 'MONDE', price: 22.45, currency: '$', type: 'etf', quality: 'CROISSANCE', info: 'CTO • Tech / Sécu' }
         ];
 
         function App() {
@@ -58,54 +69,60 @@
             }, [activeTab, search]);
 
             return (
-                <div className="min-h-screen">
-                    <div className="glass-header sticky top-0 z-50 px-6 py-5">
+                <div className="min-h-screen pb-20">
+                    <div className="glass-header sticky top-0 z-50 px-6 py-6">
                         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold">S</div>
-                                <h1 className="text-xl font-extrabold tracking-tighter uppercase">Stockly <span className="text-indigo-500">Analytics</span></h1>
-                            </div>
+                            <h1 className="text-2xl font-black tracking-tighter uppercase italic">Stockly<span className="text-indigo-500">Pro</span></h1>
                             
-                            <div className="flex bg-slate-900 rounded-xl p-1 border border-white/5 shadow-inner">
-                                <button onClick={() => setActiveTab('action')} className={`px-8 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all ${activeTab === 'action' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>Actions</button>
-                                <button onClick={() => setActiveTab('etf')} className={`px-8 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all ${activeTab === 'etf' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>ETFs</button>
+                            <div className="flex bg-slate-900 rounded-xl p-1 border border-white/10">
+                                <button onClick={() => setActiveTab('action')} className={`px-10 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all ${activeTab === 'action' ? 'bg-indigo-600' : 'text-slate-500'}`}>Actions</button>
+                                <button onClick={() => setActiveTab('etf')} className={`px-10 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all ${activeTab === 'etf' ? 'bg-indigo-600' : 'text-slate-500'}`}>ETFs</button>
                             </div>
 
                             <input 
                                 type="text" 
-                                placeholder="Rechercher ticker (AI, SAN, CW8...)" 
-                                className="w-full md:w-72 bg-slate-800/40 border border-white/10 rounded-xl px-5 py-2.5 text-sm outline-none focus:border-indigo-500/50 transition-all placeholder:text-slate-600"
+                                placeholder="Chercher un actif..." 
+                                className="w-full md:w-64 bg-slate-800/50 border border-white/10 rounded-xl px-5 py-2.5 text-sm outline-none focus:border-indigo-500 transition-all"
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    <main className="max-w-6xl mx-auto px-6 py-12">
-                        <div className="grid grid-cols-12 px-6 py-3 text-[10px] font-black uppercase text-slate-500 tracking-[0.15em] border-b border-white/5 mb-4">
-                            <div className="col-span-5">Actif</div>
+                    <main className="max-w-6xl mx-auto px-6 mt-10">
+                        <div className="grid grid-cols-12 px-6 py-4 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b border-white/5 mb-4">
+                            <div className="col-span-4">Actif / Description</div>
                             <div className="col-span-2 text-center">Zone</div>
-                            <div className="col-span-2 text-right">Prix Live</div>
-                            <div className="col-span-3 text-right">Statut / Info</div>
+                            <div className="col-span-2 text-center">Prix Live</div>
+                            <div className="col-span-2 text-center">Qualité</div>
+                            <div className="col-span-2 text-right">Enveloppe / Frais</div>
                         </div>
 
                         <div className="space-y-1">
                             {filtered.map(item => (
-                                <div key={item.id} className="grid grid-cols-12 px-6 py-5 items-center row-hover transition-all rounded-2xl border border-transparent hover:border-white/5">
-                                    <div className="col-span-5">
-                                        <div className="font-bold text-slate-100 text-base">{item.name}</div>
-                                        <div className="text-[10px] font-extrabold text-indigo-400/80 uppercase tracking-wider">{item.ticker}</div>
+                                <div key={item.id} className="grid grid-cols-12 px-6 py-6 items-center row-hover transition-all rounded-2xl border border-transparent hover:border-white/5">
+                                    <div className="col-span-4">
+                                        <div className="font-bold text-slate-100 text-lg">{item.name}</div>
+                                        <div className="text-[10px] font-black text-indigo-400 uppercase">{item.ticker}</div>
                                     </div>
                                     <div className="col-span-2 text-center">
-                                        <span className="text-[10px] font-bold px-2.5 py-1 bg-slate-800/50 text-slate-400 rounded-md border border-white/5 uppercase">{item.zone}</span>
+                                        <span className="text-[10px] font-bold px-3 py-1 bg-white/5 text-slate-400 rounded-lg border border-white/5 uppercase">{item.zone}</span>
                                     </div>
-                                    <div className="col-span-2 text-right font-black text-white tracking-tight">
-                                        {item.price.toFixed(2)} <span className="text-indigo-500 text-xs">{item.currency}</span>
+                                    <div className="col-span-2 text-center font-black text-xl text-white">
+                                        {item.price.toFixed(2)}<span className="text-indigo-500 text-sm ml-1">{item.currency}</span>
                                     </div>
-                                    <div className="col-span-3 text-right flex flex-col items-end gap-1">
-                                        <span className={`badge ${item.quality === 'SAIN' || item.quality === 'PEA' ? 'badge-sain' : 'badge-pea'}`}>
+                                    <div className="col-span-2 text-center">
+                                        <span className={`badge ${
+                                            item.quality === 'SAIN' ? 'badge-sain' : 
+                                            item.quality === 'CROISSANCE' ? 'badge-croissance' : 
+                                            item.quality === 'STABLE' ? 'badge-stable' : 'badge-alerte'
+                                        }`}>
                                             {item.quality}
                                         </span>
-                                        <span className="text-[9px] font-bold text-slate-600 uppercase">{item.info}</span>
+                                    </div>
+                                    <div className="col-span-2 text-right">
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-tighter leading-tight">
+                                            {item.info}
+                                        </div>
                                     </div>
                                 </div>
                             ))}
