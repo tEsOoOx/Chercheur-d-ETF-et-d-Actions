@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STOCKLY - Analyse Expert</title>
+    <title>STOCKLY PRO - Base de Données Étendue</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f1a; color: white; margin: 0; }
-        .row-hover:hover { background: rgba(255, 255, 255, 0.03); }
-        .glass-header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .badge-sain { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-        .badge-pea { background: rgba(99, 102, 241, 0.1); color: #818cf8; }
-        input::placeholder { color: #475569; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b101a; color: white; margin: 0; }
+        .row-hover:hover { background: rgba(99, 102, 241, 0.04); }
+        .glass-header { background: rgba(11, 16, 26, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .badge { font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
+        .badge-pea { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .badge-sain { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
     </style>
 </head>
 <body>
@@ -25,47 +25,30 @@
         const { useState, useMemo } = React;
 
         const DATA = [
-            // --- ACTIONS USA (Magnificent 7 & Tech) ---
-            { id: 1, name: 'Apple', ticker: 'AAPL', zone: 'USA', price: 228.40, currency: '$', type: 'action', quality: 'SAIN', sector: 'Tech' },
-            { id: 2, name: 'Microsoft', ticker: 'MSFT', zone: 'USA', price: 415.60, currency: '$', type: 'action', quality: 'SAIN', sector: 'Tech' },
-            { id: 3, name: 'Nvidia', ticker: 'NVDA', zone: 'USA', price: 118.20, currency: '$', type: 'action', quality: 'SAIN', sector: 'Semi-cond' },
-            { id: 4, name: 'Alphabet', ticker: 'GOOGL', zone: 'USA', price: 165.10, currency: '$', type: 'action', quality: 'SAIN', sector: 'Tech' },
-            { id: 5, name: 'Amazon', ticker: 'AMZN', zone: 'USA', price: 188.30, currency: '$', type: 'action', quality: 'SAIN', sector: 'E-com' },
-            { id: 6, name: 'Meta', ticker: 'META', zone: 'USA', price: 520.40, currency: '$', type: 'action', quality: 'SAIN', sector: 'Tech' },
-            { id: 7, name: 'Tesla', ticker: 'TSLA', zone: 'USA', price: 210.80, currency: '$', type: 'action', quality: 'VOLATILE', sector: 'Auto' },
-            { id: 8, name: 'Netflix', ticker: 'NFLX', zone: 'USA', price: 680.20, currency: '$', type: 'action', quality: 'SAIN', sector: 'Loisirs' },
-            { id: 9, name: 'Broadcom', ticker: 'AVGO', zone: 'USA', price: 172.50, currency: '$', type: 'action', quality: 'SAIN', sector: 'Semi-cond' },
-            { id: 10, name: 'Eli Lilly', ticker: 'LLY', zone: 'USA', price: 885.20, currency: '$', type: 'action', quality: 'SAIN', sector: 'Santé' },
+            // --- NOUVELLES ACTIONS DEMANDÉES ---
+            { id: 50, name: 'Air Liquide', ticker: 'AI.PA', zone: 'FRANCE', price: 168.10, currency: '€', type: 'action', quality: 'SAIN', info: 'Industrie / Gaz' },
+            { id: 51, name: 'Sanofi', ticker: 'SAN.PA', zone: 'FRANCE', price: 91.85, currency: '€', type: 'action', quality: 'STABLE', info: 'Santé / Pharma' },
+            { id: 52, name: 'Vinci', ticker: 'DG.PA', zone: 'FRANCE', price: 104.20, currency: '€', type: 'action', quality: 'SAIN', info: 'BTP / Concessions' },
+            { id: 53, name: 'InPost', ticker: 'INP.AS', zone: 'EUROPE', price: 15.40, currency: '€', type: 'action', quality: 'CROISSANCE', info: 'Logistique / E-com' },
+            { id: 54, name: 'ASML', ticker: 'ASML.AS', zone: 'EUROPE', price: 712.40, currency: '€', type: 'action', quality: 'SAIN', info: 'Semi-conducteurs' },
+            { id: 55, name: 'Schneider Electric', ticker: 'SU.PA', zone: 'FRANCE', price: 224.30, currency: '€', type: 'action', quality: 'SAIN', info: 'Énergie / Industrie' },
             
-            // --- ACTIONS FRANCE (PEA) ---
-            { id: 20, name: 'LVMH', ticker: 'MC.PA', zone: 'FRANCE', price: 625.50, currency: '€', type: 'action', quality: 'SAIN', sector: 'Luxe' },
-            { id: 21, name: 'Hermès', ticker: 'RMS.PA', zone: 'FRANCE', price: 2015.00, currency: '€', type: 'action', quality: 'SAIN', sector: 'Luxe' },
-            { id: 22, name: 'Air Liquide', ticker: 'AI.PA', zone: 'FRANCE', price: 168.10, currency: '€', type: 'action', quality: 'SAIN', sector: 'Industrie' },
-            { id: 23, name: 'Schneider Elec', ticker: 'SU.PA', zone: 'FRANCE', price: 224.30, currency: '€', type: 'action', quality: 'SAIN', sector: 'Industrie' },
-            { id: 24, name: "L'Oréal", ticker: 'OR.PA', zone: 'FRANCE', price: 368.20, currency: '€', type: 'action', quality: 'SAIN', sector: 'Conso' },
-            { id: 25, name: 'TotalEnergies', ticker: 'TTE.PA', zone: 'FRANCE', price: 61.40, currency: '€', type: 'action', quality: 'DIVIDENDE', sector: 'Energie' },
-            { id: 26, name: 'Vinci', ticker: 'DG.PA', zone: 'FRANCE', price: 104.20, currency: '€', type: 'action', quality: 'SAIN', sector: 'BTP' },
-            { id: 27, name: 'EssilorLuxottica', ticker: 'EL.PA', zone: 'FRANCE', price: 208.40, currency: '€', type: 'action', quality: 'SAIN', sector: 'Santé' },
-            { id: 28, name: 'Dassault Syst.', ticker: 'DSY.PA', zone: 'FRANCE', price: 34.20, currency: '€', type: 'action', quality: 'STABLE', sector: 'Tech' },
-            
-            // --- EUROPE ---
-            { id: 40, name: 'ASML', ticker: 'ASML.AS', zone: 'EUROPE', price: 712.40, currency: '€', type: 'action', quality: 'SAIN', sector: 'Semi-cond' },
-            { id: 41, name: 'Novo Nordisk', ticker: 'NOVO-B', zone: 'EUROPE', price: 845.00, currency: 'DKK', type: 'action', quality: 'SAIN', sector: 'Santé' },
-            { id: 42, name: 'SAP', ticker: 'SAP.DE', zone: 'EUROPE', price: 198.20, currency: '€', type: 'action', quality: 'SAIN', sector: 'Tech' },
-            { id: 43, name: 'Ferrari', ticker: 'RACE', zone: 'EUROPE', price: 422.10, currency: '€', type: 'action', quality: 'SAIN', sector: 'Luxe' },
-            
-            // --- ETFS ---
-            { id: 100, name: 'MSCI World CW8', ticker: 'CW8', zone: 'MONDE', price: 512.45, currency: '€', type: 'etf', quality: 'PEA', sector: '0.38%' },
-            { id: 101, name: 'S&P 500 ESE', ticker: 'ESE', zone: 'USA', price: 32.15, currency: '€', type: 'etf', quality: 'PEA', sector: '0.15%' },
-            { id: 102, name: 'Nasdaq 100 PUST', ticker: 'PUST', zone: 'USA', price: 42.80, currency: '€', type: 'etf', quality: 'PEA', sector: '0.30%' },
-            { id: 103, name: 'iShares Core S&P 500', ticker: 'CSPX', zone: 'USA', price: 545.20, currency: '$', type: 'etf', quality: 'CTO', sector: '0.07%' },
-            { id: 104, name: 'Vanguard All-World', ticker: 'VWCE', zone: 'MONDE', price: 121.30, currency: '€', type: 'etf', quality: 'CTO', sector: '0.22%' }
+            // --- NOUVEAUX ETFS DEMANDÉS ---
+            { id: 200, name: 'S&P 500 (ESE)', ticker: 'ESE', zone: 'USA', price: 32.15, currency: '€', type: 'etf', quality: 'PEA', info: 'Frais: 0.15%' },
+            { id: 201, name: 'Stoxx Europe 600', ticker: 'LYP6', zone: 'EUROPE', price: 112.50, currency: '€', type: 'etf', quality: 'PEA', info: 'Frais: 0.07%' },
+            { id: 202, name: 'Emerging Markets', ticker: 'PAEEM', zone: 'EMERGING', price: 5.12, currency: '€', type: 'etf', quality: 'PEA', info: 'Frais: 0.20%' },
+            { id: 203, name: 'MSCI World Swap PEA', ticker: 'CW8', zone: 'MONDE', price: 512.45, currency: '€', type: 'etf', quality: 'PEA', info: 'Frais: 0.38%' },
+            { id: 204, name: 'iShares MSCI Emerging', ticker: 'EIMI', zone: 'EMERGING', price: 32.80, currency: '$', type: 'etf', quality: 'CTO', info: 'Frais: 0.18%' },
+
+            // --- MAGNIFICENT 7 (Rappel) ---
+            { id: 1, name: 'Apple', ticker: 'AAPL', zone: 'USA', price: 228.40, currency: '$', type: 'action', quality: 'SAIN', info: 'Tech' },
+            { id: 2, name: 'Nvidia', ticker: 'NVDA', zone: 'USA', price: 118.20, currency: '$', type: 'action', quality: 'SAIN', info: 'IA / GPU' },
+            { id: 3, name: 'Microsoft', ticker: 'MSFT', zone: 'USA', price: 415.60, currency: '$', type: 'action', quality: 'SAIN', info: 'Software' }
         ];
 
         function App() {
             const [activeTab, setActiveTab] = useState('action');
             const [search, setSearch] = useState('');
-            const [selected, setSelected] = useState([]);
 
             const filtered = useMemo(() => {
                 return DATA.filter(item => 
@@ -74,84 +57,60 @@
                 );
             }, [activeTab, search]);
 
-            const toggle = (id) => {
-                setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : (prev.length < 2 ? [...prev, id] : prev));
-            };
-
             return (
                 <div className="min-h-screen">
-                    <div className="glass-header sticky top-0 z-50 px-6 py-4">
-                        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                            <h1 className="text-2xl font-extrabold tracking-tighter">STOCK<span className="text-indigo-500">LY</span></h1>
+                    <div className="glass-header sticky top-0 z-50 px-6 py-5">
+                        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold">S</div>
+                                <h1 className="text-xl font-extrabold tracking-tighter uppercase">Stockly <span className="text-indigo-500">Analytics</span></h1>
+                            </div>
                             
-                            <div className="flex bg-slate-900 rounded-xl p-1 border border-white/10">
-                                <button onClick={() => setActiveTab('action')} className={`px-6 py-2 rounded-lg text-xs font-bold uppercase ${activeTab === 'action' ? 'bg-indigo-600' : 'text-slate-500'}`}>Actions</button>
-                                <button onClick={() => setActiveTab('etf')} className={`px-6 py-2 rounded-lg text-xs font-bold uppercase ${activeTab === 'etf' ? 'bg-indigo-600' : 'text-slate-500'}`}>ETFs</button>
+                            <div className="flex bg-slate-900 rounded-xl p-1 border border-white/5 shadow-inner">
+                                <button onClick={() => setActiveTab('action')} className={`px-8 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all ${activeTab === 'action' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>Actions</button>
+                                <button onClick={() => setActiveTab('etf')} className={`px-8 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all ${activeTab === 'etf' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>ETFs</button>
                             </div>
 
-                            <div className="relative w-full md:w-80">
-                                <input 
-                                    type="text" 
-                                    placeholder="Rechercher un actif ou un ticker..." 
-                                    className="w-full bg-slate-800/50 border border-white/5 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 transition-all"
-                                    onChange={(e) => setSearch(e.target.value)}
-                                />
-                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Rechercher ticker (AI, SAN, CW8...)" 
+                                className="w-full md:w-72 bg-slate-800/40 border border-white/10 rounded-xl px-5 py-2.5 text-sm outline-none focus:border-indigo-500/50 transition-all placeholder:text-slate-600"
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
                         </div>
                     </div>
 
-                    <main className="max-w-6xl mx-auto px-6 py-10">
-                        {/* TABLE HEADER */}
-                        <div className="grid grid-cols-12 px-6 py-4 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b border-white/5">
-                            <div className="col-span-5">Actif / Secteur</div>
+                    <main className="max-w-6xl mx-auto px-6 py-12">
+                        <div className="grid grid-cols-12 px-6 py-3 text-[10px] font-black uppercase text-slate-500 tracking-[0.15em] border-b border-white/5 mb-4">
+                            <div className="col-span-5">Actif</div>
                             <div className="col-span-2 text-center">Zone</div>
-                            <div className="col-span-2 text-center">Prix</div>
-                            <div className="col-span-2 text-center">{activeTab === 'action' ? 'Qualité' : 'Frais / PEA'}</div>
-                            <div className="col-span-1 text-right">Duel</div>
+                            <div className="col-span-2 text-right">Prix Live</div>
+                            <div className="col-span-3 text-right">Statut / Info</div>
                         </div>
 
-                        {/* TABLE ROWS */}
-                        <div className="divide-y divide-white/5">
+                        <div className="space-y-1">
                             {filtered.map(item => (
-                                <div key={item.id} className="grid grid-cols-12 px-6 py-6 items-center row-hover transition-colors rounded-xl">
+                                <div key={item.id} className="grid grid-cols-12 px-6 py-5 items-center row-hover transition-all rounded-2xl border border-transparent hover:border-white/5">
                                     <div className="col-span-5">
-                                        <div className="font-bold text-white text-lg">{item.name}</div>
-                                        <div className="text-[10px] font-black text-indigo-400 uppercase tracking-tighter">{item.ticker} • {item.sector}</div>
+                                        <div className="font-bold text-slate-100 text-base">{item.name}</div>
+                                        <div className="text-[10px] font-extrabold text-indigo-400/80 uppercase tracking-wider">{item.ticker}</div>
                                     </div>
                                     <div className="col-span-2 text-center">
-                                        <span className="text-[10px] font-bold px-2 py-1 bg-white/5 rounded-md border border-white/5">{item.zone}</span>
+                                        <span className="text-[10px] font-bold px-2.5 py-1 bg-slate-800/50 text-slate-400 rounded-md border border-white/5 uppercase">{item.zone}</span>
                                     </div>
-                                    <div className="col-span-2 text-center font-bold text-white">
-                                        {item.price.toFixed(2)}{item.currency}
+                                    <div className="col-span-2 text-right font-black text-white tracking-tight">
+                                        {item.price.toFixed(2)} <span className="text-indigo-500 text-xs">{item.currency}</span>
                                     </div>
-                                    <div className="col-span-2 text-center">
-                                        <span className={`text-[9px] font-black px-3 py-1 rounded-full ${item.quality === 'SAIN' || item.quality === 'PEA' ? 'badge-sain' : 'badge-pea'}`}>
+                                    <div className="col-span-3 text-right flex flex-col items-end gap-1">
+                                        <span className={`badge ${item.quality === 'SAIN' || item.quality === 'PEA' ? 'badge-sain' : 'badge-pea'}`}>
                                             {item.quality}
                                         </span>
-                                    </div>
-                                    <div className="col-span-1 text-right">
-                                        <button 
-                                            onClick={() => toggle(item.id)}
-                                            className={`w-10 h-10 rounded-xl transition-all flex items-center justify-center font-bold ${selected.includes(item.id) ? 'bg-indigo-600 text-white' : 'bg-white/5 text-slate-500 hover:text-white'}`}
-                                        >
-                                            {selected.includes(item.id) ? '✓' : '+'}
-                                        </button>
+                                        <span className="text-[9px] font-bold text-slate-600 uppercase">{item.info}</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </main>
-
-                    {/* FLOATING DUEL BOX */}
-                    {selected.length > 0 && (
-                        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-indigo-600 px-10 py-5 rounded-[2rem] shadow-2xl flex items-center gap-8 border border-white/20 animate-bounce-short">
-                            <div className="text-white">
-                                <span className="text-[10px] font-black uppercase block opacity-70">Mode Duel</span>
-                                <span className="font-bold">{selected.length} sélectionné(s)</span>
-                            </div>
-                            <button onClick={() => setSelected([])} className="bg-black/20 hover:bg-black/40 px-6 py-2 rounded-xl text-xs font-bold transition-all">Réinitialiser</button>
-                        </div>
-                    )}
                 </div>
             );
         }
